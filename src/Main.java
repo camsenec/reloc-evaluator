@@ -1,4 +1,4 @@
-import CentralServer.FieldManager;
+import MetaServer.FieldManager;
 import Constants.Constants;
 import EdgeServer.EdgeServer;
 
@@ -12,10 +12,12 @@ public class Main {
 
         /* read command line argument */
         int numberOfServers = Integer.parseInt(args[0]);
-        int capacity = Integer.parseInt(args[1]);
+        int capacityOfServers = Integer.parseInt(args[1]);
+        int numberOfClients = Integer.parseInt(args[2]);
 
         /* construct edge server on the field */
-        FieldManager.createServers(numberOfServers, capacity);
+        FieldManager.setGrainLevel(numberOfServers);
+        FieldManager.createServers(capacityOfServers);
 
         if(Constants.DEBUG) {
             for (EdgeServer server : FieldManager.serverList) {
@@ -24,6 +26,10 @@ public class Main {
         }
 
         /* create clients */
+        for(int i = 0; i < numberOfClients; i++){
+
+        }
+
 
 
         /* simulation */

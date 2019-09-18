@@ -1,6 +1,6 @@
 package HTTP;
 
-import CentralServer.FieldManager;
+import MetaServer.FieldManager;
 import Data.Document;
 import EdgeServer.EdgeServer;
 

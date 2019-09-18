@@ -1,4 +1,4 @@
-package CentralServer;
+package MetaServer;
 
 import Constants.Constants;
 import EdgeServer.EdgeServer;
@@ -15,7 +15,7 @@ public class FieldManager {
     public static final double MAX_X = 100;
     public static final double MAX_Y = 100;
 
-    public static int grainLevel;
+    private static int GRAIN_LEVEL = 2;
 
     /*
       Allocation of EdgeServer ID (grainLevel = 2)
@@ -61,7 +61,7 @@ public class FieldManager {
         int serverId = 0;
         ArrayList<EdgeServer> tmpServerList= new ArrayList<>();
 
-        for(int level = 1; level <= Constants.GRAIN_LEVEL; level++) {
+        for(int level = 1; level <= GRAIN_LEVEL; level++) {
             for (EdgeServer server : serverList) {
                 double x = server.getLocation().getX();
                 double y = server.getLocation().getY();
@@ -116,6 +116,10 @@ public class FieldManager {
 
         return serverId;
 
+    }
+
+    public static void setGrainLevel(int grainLevel) {
+        GRAIN_LEVEL = grainLevel;
     }
 
 }
