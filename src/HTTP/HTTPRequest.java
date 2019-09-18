@@ -5,19 +5,28 @@ import Data.Document;
 import EdgeServer.EdgeServer;
 
 public class HTTPRequest {
-    public static HTTPResponse GET(int serverId, int documentId){
-        EdgeServer requestedServer = FieldManager.serverList.get(serverId);
-        Document HTTPResponse = requestedServer.getCollection().get(documentId);
 
-        if(response == null) {
+    /*
+     Only metadata is enough for return value on simulation
+     */
+    public static HTTPResponseMetaData GET(int serverId, int documentId){
+        EdgeServer requestedServer = FieldManager.serverList.get(serverId);
+        Document responseBody = requestedServer.getCollection().get(documentId);
+        double responseTime = 0.0;
+        double transmissionCost = 0.0;
+
+        if(responseBody == null) {
             /**
              * need an algorithm (can be contribution)
+             * documentbase : response = document.cachedServer.HTTPRequestForward()
              **/
-            //response = document.cachedServer.HTTPRequestForward()
-            //group内
-            return response;
+
+            responseTime += 0.1;
+            transmissionCost += 0.1;
+
+            return new HTTPResponseMetaData(responseTime, transmissionCost);
         }else{
-            return response;
+            return new HTTPResponseMetaData(responseTime, transmissionCost);
         }
 
     }
