@@ -1,5 +1,6 @@
 package EdgeServer;
 
+import Data.Document;
 import Field.Point2D;
 
 import java.net.http.HttpRequest;
@@ -11,8 +12,10 @@ public class EdgeServer {
     private Point2D location;
     /*とりあえず3段階 1.弱い, 2. 普通, 3. 強い*/
     private int performanceLevel = 2;
+
     private int capacity;
     private int remain;
+    private HashMap<Integer, Document> collection = new HashMap<>();
 
     public EdgeServer(int id, int capacity, Point2D location){
         this.id = id;
@@ -26,5 +29,22 @@ public class EdgeServer {
 
 
         }
+    }
+
+    public Point2D getLocation() {
+        return location;
+    }
+
+    public void setLocation(Point2D location) {
+        this.location = location;
+    }
+
+    public HashMap<Integer, Document> getCollection() {
+        return collection;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("id : %d\t\tlocation : (%6.2f, %6.2f)", id, location.getX(), location.getY());
     }
 }
