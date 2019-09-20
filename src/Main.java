@@ -1,6 +1,12 @@
+import MetaServer.ClientManager;
 import MetaServer.FieldManager;
 import Constants.Constants;
 import EdgeServer.EdgeServer;
+import MetaServer.ServerManager;
+
+import java.util.HashMap;
+
+import static java.lang.Math.log;
 
 public class Main {
     public static int MAX_T = 10000;
@@ -16,21 +22,19 @@ public class Main {
         int numberOfClients = Integer.parseInt(args[2]);
 
         /* construct edge server on the field */
-        FieldManager.setGrainLevel(numberOfServers);
-        FieldManager.createServers(capacityOfServers);
+        ServerManager.setnumberOfServers(numberOfServers);
+        ServerManager.createServers(capacityOfServers);
 
         if(Constants.DEBUG) {
-            for (EdgeServer server : FieldManager.serverList) {
-                System.out.println(server);
+            HashMap<Integer, EdgeServer> serverMap = ServerManager.serverMap;
+            for (int serverId : ServerManager.serverMap.keySet()) {
+                System.out.println(serverMap.get(serverId));
             }
         }
 
         /* create clients */
-        for(int i = 0; i < numberOfClients; i++){
-
-        }
-
-
+        ClientManager.setNumberOfClients(numberOfClients);
+        ClientManager.createClients();
 
         /* simulation */
         for(int t = 0; t < MAX_T; t++){

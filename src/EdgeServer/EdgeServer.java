@@ -17,6 +17,7 @@ public class EdgeServer {
 
     private int capacity;
     private int remain;
+    /* {key : value}  = { id : Document } */
     private HashMap<Integer, Document> collection = new HashMap<>();
 
     public EdgeServer(int id, int capacity, Point2D location){
@@ -27,10 +28,6 @@ public class EdgeServer {
     }
 
     public void HTTPRequestForward(){
-        for(int i = 0; i < sameGroupServer.size(); i++){
-
-
-        }
     }
 
     public Point2D getLocation() {

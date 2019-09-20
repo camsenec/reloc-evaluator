@@ -3,6 +3,8 @@ package ClientSide;
 import MetaServer.FieldManager;
 import EdgeServer.EdgeServer;
 import Field.Point2D;
+import MetaServer.ServerManager;
+
 import java.util.Random;
 
 public class Client {
@@ -26,9 +28,10 @@ public class Client {
 
     }
 
+    //run at regular intervals
     public void updateNearestServer(){
-        int id = FieldManager.findNearestServer(this.location);
-        this.nearestServer = FieldManager.serverList.get(id);
+        int id = ServerManager.findNearestServer(this.location);
+        this.nearestServer = ServerManager.serverMap.get(id);
     }
 
 

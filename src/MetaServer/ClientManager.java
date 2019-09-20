@@ -1,17 +1,37 @@
 package MetaServer;
 
+import ClientSide.Client;
 import EdgeServer.EdgeServer;
+import Field.Point2D;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
 
 public class ClientManager {
-    public static final ArrayList<EdgeServer> clientList = new ArrayList<>(100);
+    public static final HashMap<Integer, Client> clientMap = new HashMap<>();
 
-    public static final double MIN_Y = 0;
-    public static final double MIN_X = 0;
-    public static final double MAX_X = 100;
-    public static final double MAX_Y = 100;
+    private static int NUMBER_OF_CLIENTS = 100;
 
-    private static int GRAIN_LEVEL = 2;
+    /**
+     * create clients on the field
+     */
+    public static void createClients(){
 
+        double areaLengthX = FieldManager.MAX_X - FieldManager.MIN_X;
+        double areaLengthY = FieldManager.MAX_Y - FieldManager.MIN_Y;
+
+        for(int clientId = 0; clientId <= NUMBER_OF_CLIENTS; clientId++) {
+            Random random = new Random();
+            double locationX = FieldManager.MIN_X + random.nextDouble() * areaLengthX;
+            double locationY = FieldManager.MIN_Y + random.nextDouble() * areaLengthY;
+            Client client = new Client(clientId, new Point2D(locationX, locationY));
+            clientMap.put(clientId, client);
+        }
+
+    }
+
+    public static void setNumberOfClients(int numberOfClients) {
+        NUMBER_OF_CLIENTS = numberOfClients;
+    }
 }
