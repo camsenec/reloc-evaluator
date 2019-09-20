@@ -4,15 +4,19 @@ public class Document {
     /* need to define level and suggest to user, these may be set by user or developer with constraint.*/
     /* Cacheを行うか, あるいは置き換えるかの判断に用いる*/
 
+    /** METADATA **/
     /*とりあえず3段階 1.弱い, 2. 普通, 3. 強い*/
     private int consistencyLevel = 2;
     private int priorityLevel = 2;
-
     /* サイズはドキュメントがポストされたときに動的に取得する必要がある. Simulationでは固定?*/
     private int size;
 
-    public Document(int size) {
+    /** Part of Body **/
+    private int userId;
+
+    public Document(int size, int userId) {
         this.size = size;
+        this.userId = userId;
     }
 
     public int getConsistencyLevel() {
