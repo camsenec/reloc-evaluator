@@ -1,23 +1,24 @@
 package Data;
 
+import java.util.UUID;
+
 public class Document {
     /* need to define level and suggest to user, these may be set by user or developer with constraint.*/
     /* Cacheを行うか, あるいは置き換えるかの判断に用いる*/
 
     /** METADATA **/
-    private int id;
+    private UUID id;
     /*とりあえず3段階 1.弱い, 2. 普通, 3. 強い*/
     private int consistencyLevel = 2;
     private int priorityLevel = 2;
     /* サイズはドキュメントがポストされたときに動的に取得する必要がある. Simulationでは固定?*/
-    private int size;
+    private int size = 1;
 
     /** Part of Body **/
     private int userId;
 
-    public Document(int id, int size, int userId) {
+    public Document(UUID id, int userId) {
         this.id = id;
-        this.size = size;
         this.userId = userId;
     }
 

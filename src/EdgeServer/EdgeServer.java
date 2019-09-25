@@ -3,8 +3,8 @@ package EdgeServer;
 import Data.Document;
 import Field.Point2D;
 import Utility.Range;
-
-import java.util.HashMap;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EdgeServer {
     private int id;
@@ -17,7 +17,7 @@ public class EdgeServer {
     private int remain;
 
     /* {key : value}  = { id : Document } */
-    private final static HashMap<Integer, Document> collection = new HashMap<>();
+    private final static ConcurrentHashMap<UUID, Document> collection = new ConcurrentHashMap<>();
 
 
     public EdgeServer(int id, int capacity, Point2D location){
@@ -27,7 +27,9 @@ public class EdgeServer {
         this.remain = capacity;
     }
 
-    public void HTTPRequestForward(){
+    public void updateRemain(UUID documentID){
+      this.remain -= this.collection.get(documentID).getSize();
+
     }
 
     public int getId() {
@@ -38,7 +40,7 @@ public class EdgeServer {
         return location;
     }
 
-    public HashMap<Integer, Document> getCollection() {
+    public ConcurrentHashMap<UUID, Document> getCollection() {
         return collection;
     }
 

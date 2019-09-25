@@ -8,4 +8,8 @@ public class HTTPResponseMetaData {
         this.responseTime = responseTime;
         this.transmissionCost = transmissionCost;
     }
+
+    public String toLogFile() {
+        return String.format("%10.2f\t10.2f", responseTime, transmissionCost);
+    }
 }

@@ -35,6 +35,12 @@ public class ClientManager {
         }
     }
 
+    public static void updateNearestServerOfAllClients(){
+        for(int clientId : clientMap.keySet()){
+            clientMap.get(clientId).updateNearestServer();
+        }
+    }
+
     public static void setNumberOfClients(int numberOfClients) {
         NUMBER_OF_CLIENTS = numberOfClients;
     }
