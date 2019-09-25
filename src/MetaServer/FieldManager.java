@@ -1,11 +1,5 @@
 package MetaServer;
 
-import Constants.Constants;
-import EdgeServer.EdgeServer;
-import Field.Point2D;
-
-import java.util.*;
-
 public class FieldManager {
 
     public static final double MIN_Y = 0;

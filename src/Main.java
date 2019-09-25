@@ -18,6 +18,7 @@ public class Main {
         /* read command line argument */
         int numberOfServers = Integer.parseInt(args[0]);
         int capacityOfServers = Integer.parseInt(args[1]);
+        int groupSize = Integer.parseInt(args[2]);
         int numberOfClients = Integer.parseInt(args[2]);
 
         /* construct edge server on the field */
@@ -30,6 +31,10 @@ public class Main {
                 System.out.println(serverMap.get(serverId));
             }
         }
+
+        /* grouping server */
+        ServerManager.setGroupSize(groupSize);
+        ServerManager.groupingServer();
 
         /* create clients */
         ClientManager.setNumberOfClients(numberOfClients);
@@ -49,12 +54,16 @@ public class Main {
         ※
          */
 
+        /* create documents on Server*/
+        ClientManager.updateLocationOfAllClients();
+
         /**残りで作り込まないといけないのは,
          * ・POSTするときの, 配置手法（大事）-> 暫定
          * ・定期的な再配置をするときのその手法（大事）-> 暫定
          * ・Documentに対して優先度を設定 -> 暫定
          * ・メトリクス -> 暫定(HRだけとかでもOK)
-         * ・サーバーのグルーピング手法(暫定) -> 未実装
+         *
+         * ・サーバーのグルーピング手法(暫定) -> OK
          */
         /** 余裕があれば可視化までできるとなお良い(python scriptあたり？)*/
 
@@ -64,6 +73,8 @@ public class Main {
         /* ここは単純に評価のため*/
         /* HTTPRequestをすると, METADATA(latency, transmissioncost)が帰ってくる*/
         /* それをログに保持しておく -> あとで合算すれば良い*/
+
+        /*評価*/
         Client client;
         for(int t = 0; t < MAX_T; t++) {
             HashMap<Integer, Client> clientMap = ClientManager.clientMap;

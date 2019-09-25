@@ -3,16 +3,18 @@ package MetaServer;
 import Constants.Constants;
 import EdgeServer.EdgeServer;
 import Field.Point2D;
+import Utility.Range;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.lang.Math.log;
 
 public class ServerManager {
 
-    public static final HashMap<Integer, EdgeServer> serverMap = new HashMap();
-    public static final HashMap<Integer, ServerGroup> groupMap = new HashMap();
-    private static int NUMBER_OF_SERVERS = 2;
+    public static final ConcurrentHashMap<Integer, EdgeServer> serverMap = new ConcurrentHashMap();
+    private static int NUMBER_OF_SERVERS = 16;
+    private static int GROUP_SIZE = NUMBER_OF_SERVERS / 4;
 
     /*
       Allocation of EdgeServer ID (grainLevel = 2)
@@ -44,6 +46,7 @@ public class ServerManager {
      * Example of the allocation is shown above.
      * grainLevel : number of 4^(grainLevel) servers are created recursively.
      * @param capacity : size of memory on edgeServer which is allocated to particular application
+     * ->全サーバーのキャパシティを明示的に示しても良いし, 候補だけ与えておいても良い. とりあえず100ブロックで固定する.
      */
     public static void createServers(int capacity){
 
@@ -117,16 +120,25 @@ public class ServerManager {
 
     }
 
-    public static void groupingServer(int groupGrainLevel){
-
-
-
+    public static void groupingServer(){
+        for(int i = 0; i < Math.ceil(NUMBER_OF_SERVERS / GROUP_SIZE); i++){
+            int lowest = GROUP_SIZE * i;
+            int highest = GROUP_SIZE * (i + 1) - 1;
+            for(int j = 0; j < GROUP_SIZE; j++){
+                serverMap.get(i).setSameGroupServers(new Range(lowest, highest));
+            }
+        }
     }
 
     public static void setnumberOfServers(int numberOfServers) {
         NUMBER_OF_SERVERS = numberOfServers;
     }
 
-
-
+    public static void setGroupSize(int groupSize) {
+        if(groupSize < NUMBER_OF_SERVERS) {
+            GROUP_SIZE = groupSize;
+        }else{
+            System.err.println("group size must be less than number of servers");
+        }
+    }
 }

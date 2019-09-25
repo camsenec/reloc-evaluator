@@ -1,24 +1,24 @@
 package EdgeServer;
 
 import Data.Document;
-import Field.Area;
 import Field.Point2D;
+import Utility.Range;
 
-import java.net.http.HttpRequest;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class EdgeServer {
     private int id;
     private Point2D location;
-    private Area area;
+    private Range sameGroupServers;
+
     /*とりあえず3段階 1.弱い, 2. 普通, 3. 強い*/
     private int performanceLevel = 2;
-
     private int capacity;
     private int remain;
+
     /* {key : value}  = { id : Document } */
-    private HashMap<Integer, Document> collection = new HashMap<>();
+    private final static HashMap<Integer, Document> collection = new HashMap<>();
+
 
     public EdgeServer(int id, int capacity, Point2D location){
         this.id = id;
@@ -30,16 +30,20 @@ public class EdgeServer {
     public void HTTPRequestForward(){
     }
 
+    public int getId() {
+        return id;
+    }
+
     public Point2D getLocation() {
         return location;
     }
 
-    public void setLocation(Point2D location) {
-        this.location = location;
-    }
-
     public HashMap<Integer, Document> getCollection() {
         return collection;
+    }
+
+    public void setSameGroupServers(Range sameGroupServers) {
+        this.sameGroupServers = sameGroupServers;
     }
 
     @Override

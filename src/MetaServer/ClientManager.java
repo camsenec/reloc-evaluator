@@ -1,15 +1,13 @@
 package MetaServer;
 
 import ClientSide.Client;
-import EdgeServer.EdgeServer;
 import Field.Point2D;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ClientManager {
-    public static final HashMap<Integer, Client> clientMap = new HashMap<>();
+    public static final ConcurrentHashMap<Integer, Client> clientMap = new ConcurrentHashMap<>();
 
     private static int NUMBER_OF_CLIENTS = 100;
 
@@ -29,6 +27,12 @@ public class ClientManager {
             clientMap.put(clientId, client);
         }
 
+    }
+
+    public static void updateLocationOfAllClients(){
+        for(int clientId : clientMap.keySet()){
+            clientMap.get(clientId).updateLocation();
+        }
     }
 
     public static void setNumberOfClients(int numberOfClients) {

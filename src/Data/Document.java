@@ -5,6 +5,7 @@ public class Document {
     /* Cacheを行うか, あるいは置き換えるかの判断に用いる*/
 
     /** METADATA **/
+    private int id;
     /*とりあえず3段階 1.弱い, 2. 普通, 3. 強い*/
     private int consistencyLevel = 2;
     private int priorityLevel = 2;
@@ -14,7 +15,8 @@ public class Document {
     /** Part of Body **/
     private int userId;
 
-    public Document(int size, int userId) {
+    public Document(int id, int size, int userId) {
+        this.id = id;
         this.size = size;
         this.userId = userId;
     }
