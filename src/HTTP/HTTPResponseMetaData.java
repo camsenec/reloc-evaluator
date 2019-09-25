@@ -10,6 +10,6 @@ public class HTTPResponseMetaData {
     }
 
     public String toLogFile() {
-        return String.format("%10.2f\t10.2f", responseTime, transmissionCost);
+        return String.format("%10.2f\t%10.2f", responseTime, transmissionCost);
     }
 }

@@ -28,7 +28,7 @@ public class Log {
 
     public static void outputResponseData(HTTPResponseMetaData response){
         try{
-            fw.write(response.toLogFile());
+            fw.write(response.toLogFile() + '\n');
         }catch(IOException e){
             System.err.println("cannot write to logfile");
         }

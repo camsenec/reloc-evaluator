@@ -12,42 +12,56 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Main {
-    public static int MAX_T = 10000;
+    public static int MAX_T = 10;
 
     public static void main(String args[]){
-        if(args.length < 3){
-            System.err.println("You need to set commandline argument");
-        }
+
+        int numberOfServers;
+        int capacityOfServers;
+        int groupSize;
+        int numberOfClients;
 
         /* read command line argument */
-        int numberOfServers = Integer.parseInt(args[0]);
-        int capacityOfServers = Integer.parseInt(args[1]);
-        int groupSize = Integer.parseInt(args[2]);
-        int numberOfClients = Integer.parseInt(args[2]);
+        if(args.length != 4){
+            numberOfServers = 4;
+            capacityOfServers = 10000;
+            groupSize = 1;
+            numberOfClients = 10;
+        }else {
+            numberOfServers = Integer.parseInt(args[0]);
+            capacityOfServers = Integer.parseInt(args[1]);
+            groupSize = Integer.parseInt(args[2]);
+            numberOfClients = Integer.parseInt(args[3]);
+        }
 
         /* construct edge server on the field */
-        ServerManager.setnumberOfServers(numberOfServers);
+        ServerManager.setNumberOfServers(numberOfServers);
         ServerManager.createServers(capacityOfServers);
 
         if(Constants.DEBUG) {
-            ConcurrentHashMap<Integer, EdgeServer> serverMap = ServerManager.serverMap;
-            for (int serverId : ServerManager.serverMap.keySet()) {
-                System.out.println(serverMap.get(serverId));
-            }
+            System.out.println("-----------Servers Created-----------");
+            ServerManager.printAllServers();
         }
 
         /* grouping server */
         ServerManager.setGroupSize(groupSize);
         ServerManager.groupingServer();
 
+
         /* create clients */
         ClientManager.setNumberOfClients(numberOfClients);
         ClientManager.createClients();
         ClientManager.updateLocationOfAllClients();
+        ClientManager.updateNearestServerOfAllClients();
+        if(Constants.DEBUG) {
+            System.out.println("-----------Clients Created-----------");
+            ClientManager.printAllClients();
+        }
 
         /* create Document */
+        /* 一人あたり100個のドキュメントを生成*/
         Client client;
-        for(int t = 1; t <= MAX_T; t++) {
+        for(int i = 1;  i <= 100; i++) {
             ConcurrentHashMap<Integer, Client> clientMap = ClientManager.clientMap;
             for (int clientId : clientMap.keySet()) {
                 client = clientMap.get(clientId);
@@ -55,9 +69,18 @@ public class Main {
                 HTTPResponseMetaData response = client.POST();
                 //Log.outputResponseData(response);
             }
+            if(i % 3 == 0) {
+                ClientManager.updateLocationOfAllClients();
+                ClientManager.updateNearestServerOfAllClients();
+            }
         }
 
-        /*評価*/
+        if(Constants.DEBUG) {
+            System.out.println("-----------Collection on EachServers Created-----------");
+            ServerManager.printCollectionSizeOfAllServers();
+        }
+
+        /*GETによる評価*/
         Log.openLogfile();
         Random random = new Random();
 
@@ -66,15 +89,20 @@ public class Main {
             for (int clientId : clientMap.keySet()) {
                 client = clientMap.get(clientId);
                 //最も近いサーバーからGETをする（しようとする）
-
                 UUID documentId = DocumentIds.ids.get(random.nextInt(DocumentIds.ids.size()));
                 HTTPResponseMetaData response = client.GET(documentId);
                 Log.outputResponseData(response);
             }
 
-            if(t % 3 == 0)
+            if(t % 3 == 0) {
                 ClientManager.updateLocationOfAllClients();
                 ClientManager.updateNearestServerOfAllClients();
+            }
+        }
+
+        if(Constants.DEBUG) {
+            System.out.println("-----------Remain of Each Server-----------");
+            ServerManager.printRemainOfAllServers();
         }
 
     }

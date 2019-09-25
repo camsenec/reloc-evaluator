@@ -17,7 +17,7 @@ public class EdgeServer {
     private int remain;
 
     /* {key : value}  = { id : Document } */
-    private final static ConcurrentHashMap<UUID, Document> collection = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<UUID, Document> collection = new ConcurrentHashMap<>();
 
 
     public EdgeServer(int id, int capacity, Point2D location){
@@ -46,6 +46,10 @@ public class EdgeServer {
 
     public void setSameGroupServers(Range sameGroupServers) {
         this.sameGroupServers = sameGroupServers;
+    }
+
+    public int getRemain() {
+        return remain;
     }
 
     @Override
