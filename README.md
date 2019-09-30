@@ -10,7 +10,7 @@
 
 Fig. 1のようなアーキテクチャを考える. C1 ~ C9 はMECサーバーを表しており, ユーザーはある範囲内で自由に動き回りながら, 各サーバーに対してHTTPリクエストをすることができる. 
 
-<div align="center>
+<div align="center">
 ![arch](https://github.com/thanatoth/edge-simulator/blob/doc/doc/arch.png)
 </div>
 
