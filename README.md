@@ -8,15 +8,15 @@
 
 ## アーキテクチャ
 
-Fig. 1のようなアーキテクチャを考える. C1 ~ C9 はMECサーバーを表しており, ユーザーはある範囲内で自由に動き回りながら, 各サーバーに対してHTTPリクエストをすることができる. 
+Fig. 1のようなアーキテクチャを考える. C1 ~ C9 はMECサーバーを表しており, ユーザーはある範囲内で自由に動き回りながら, 各サーバーに対してHTTPリクエストをすることができる.    
 
 <div align="center">
 <img src="https://github.com/thanatoth/edge-simulator/blob/doc/doc/arch.png" title = "arch">
-</div>
+</div>    
 
 <div align="center">
 Fig. 1 Our System Model of MEC Architecture
-</div>
+</div>    
 
 
 <br>
@@ -30,18 +30,18 @@ Fig. 1 Our System Model of MEC Architecture
 </div>
 
 
-<br>
-フィールドは区画で区切られており, 各クライアントは同一区画上のサーバーからレコードを取得することを試みる（HTTP GET リクエストをする）. 
-<br>
+<br>    
+フィールドは区画で区切られており, 各クライアントは同一区画上のサーバーからレコードを取得することを試みる（HTTP GET リクエストをする）.     
+<br>    
 
 <div align="center">
 <img src="https://github.com/thanatoth/edge-simulator/blob/doc/doc/near.png" title="near">
 </div>
 
 
-<br>
-各サーバーは独立にキャッシュを持ち, ドキュメントを保持する. 
-<br>
+<br>  
+各サーバーは独立にキャッシュを持ち, ドキュメントを保持する.     
+<br>    
 
 
 
