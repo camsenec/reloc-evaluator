@@ -19,7 +19,7 @@ Fig. 1 Our System Model of MEC Architecture
 </div>    
 
 
-<br>
+<br><br><br>
 シミュレーター上では以下のように表現されている. 以下はサーバーが16個, クライアントが100人の場合で, 青丸がサーバー, 黒丸がクライアントを表している.     
 <br>
 
@@ -30,7 +30,7 @@ Fig. 1 Our System Model of MEC Architecture
 </div>
 
 
-<br>    
+<br><br>
 フィールドは区画で区切られており, 各クライアントは同一区画上のサーバーからレコードを取得することを試みる（HTTP GET リクエストをする）.     
 <br>    
 
