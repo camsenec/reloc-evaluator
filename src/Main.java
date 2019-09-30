@@ -23,10 +23,10 @@ public class Main {
 
         /* read command line argument */
         if(args.length != 4){
-            numberOfServers = 4;
+            numberOfServers = 16;
             capacityOfServers = 10000;
             groupSize = 1;
-            numberOfClients = 10;
+            numberOfClients = 100;
         }else {
             numberOfServers = Integer.parseInt(args[0]);
             capacityOfServers = Integer.parseInt(args[1]);

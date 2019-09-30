@@ -27,4 +27,9 @@ public class Point2D {
     public void setY(double y) {
         this.y = y;
     }
+
+    @Override
+    public String toString() {
+        return String.format("(%6.3f, %6.3f)", x, y);
+    }
 }

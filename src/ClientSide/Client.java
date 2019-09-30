@@ -25,10 +25,17 @@ public class Client {
     //client can move following gaussian distribution
     public void updateLocation() {
         Random random = new Random();
-        this.location.setX(this.location.getX()
-                + random.nextGaussian() % (FieldManager.MAX_X - FieldManager.MIN_X) + FieldManager.MIN_X);
-        this.location.setY(this.location.getY()
-                + random.nextGaussian() % (FieldManager.MAX_Y - FieldManager.MIN_Y) + FieldManager.MIN_Y);
+        double areaLengthX = FieldManager.MAX_X - FieldManager.MIN_X;
+        double areaLengthY = FieldManager.MAX_Y - FieldManager.MIN_Y;
+
+        this.location.setX((location.getX()
+                + random.nextGaussian()) % areaLengthX + FieldManager.MIN_X);
+        this.location.setY((location.getY()
+                + random.nextGaussian()) % areaLengthY + FieldManager.MIN_Y);
+
+        if(location.getX() < 0) this.location.setX(location.getX() + areaLengthX);
+        if(location.getY() < 0) this.location.setY(location.getY() + areaLengthY);
+
 
     }
 
@@ -36,6 +43,7 @@ public class Client {
     public void updateNearestServer() {
         int id = ServerManager.findNearestServer(this.location);
         this.nearestServer = ServerManager.serverMap.get(id);
+        System.out.println("location : " +  this.location + "  NSid : " + nearestServer.getId() + "  NSloc : " + nearestServer.getLocation());
     }
 
     /*
@@ -75,7 +83,7 @@ public class Client {
         UUID uuid = UUID.randomUUID();
         Document document = new Document(uuid, this.id);
         requestedServer.getCollection().put(uuid, document);
-        System.out.println("DEBUG" + " " + serverId + " " + requestedServer.getCollection().size());
+        //System.out.println("DEBUG" + " " + serverId + " " + requestedServer.getCollection().size());
         requestedServer.updateRemain(uuid);
 
         DocumentIds.ids.add(uuid);

@@ -96,29 +96,38 @@ public class ServerManager {
     public static int findNearestServer(Point2D location){
         int grainLevel = (int)(log((double)NUMBER_OF_SERVERS) / log(4.0));
 
-        double areaLengthX = FieldManager.MAX_X - FieldManager.MIN_X;
-        double areaLengthY = FieldManager.MAX_Y - FieldManager.MIN_Y;
+        double areaLengthX = (FieldManager.MAX_X - FieldManager.MIN_X) / 2;
+        double areaLengthY = (FieldManager.MAX_Y - FieldManager.MIN_Y) / 2;
         double locationX = location.getX();
         double locationY = location.getY();
+        double posX = areaLengthX;
+        double posY = areaLengthY;
 
         int serverId = 0;
         int interval;
 
-        for(int level = grainLevel - 1; level >= 0; level--) {
+        for(int level = grainLevel - 1; level >= 0; level--) { //長さではなくposition
             interval = (int)Math.pow(4, (double)level);
-
-            if (locationX <= areaLengthX / 2 && locationY <= areaLengthY / 2) {
-                serverId += interval * 0;
-            } else if (locationX > areaLengthX / 2 && locationY <= areaLengthY / 2) {
-                serverId += interval * 1;
-            } else if (locationX <= areaLengthX / 2 && locationY > areaLengthY / 2) {
-                serverId += interval * 2;
-            } else {
-                serverId += interval * 3;
-            }
-
             areaLengthX /= 2;
             areaLengthY /= 2;
+
+            if (locationX <= posX && locationY <= posY) {
+                serverId += interval * 0;
+                posX -= areaLengthX;
+                posY -= areaLengthY;
+            } else if (locationX > posX && locationY <= posY) {
+                serverId += interval * 1;
+                posX += areaLengthX;
+                posY -= areaLengthY;
+            } else if (locationX <= posX && locationY > posY) {
+                serverId += interval * 2;
+                posX -= areaLengthX;
+                posY += areaLengthY;
+            } else {
+                posX += areaLengthX;
+                posY += areaLengthY;
+                serverId += interval * 3;
+            }
         }
 
         return serverId;
