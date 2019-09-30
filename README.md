@@ -21,7 +21,7 @@ Fig. 1 Our System Model of MEC Architecture
 
 <br>
 シミュレーター上では以下のように表現されている. 以下はサーバーが16個, クライアントが100人の場合で, 青丸がサーバー, 黒丸がクライアントを表している. 
-
+<br>
 
 
 
@@ -32,7 +32,7 @@ Fig. 1 Our System Model of MEC Architecture
 
 <br>
 フィールドは区画で区切られており, 各クライアントは同一区画上のサーバーからレコードを取得することを試みる（HTTP GET リクエストをする）. 
-
+<br>
 
 <div align="center">
 <img src="https://github.com/thanatoth/edge-simulator/blob/doc/doc/near.png" title="near">
@@ -41,8 +41,7 @@ Fig. 1 Our System Model of MEC Architecture
 
 <br>
 各サーバーは独立にキャッシュを持ち, ドキュメントを保持する. 
-
-
+<br>
 
 
 
