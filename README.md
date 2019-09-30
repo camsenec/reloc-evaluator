@@ -10,33 +10,36 @@
 
 Fig. 1のようなアーキテクチャを考える. C1 ~ C9 はMECサーバーを表しており, ユーザーはある範囲内で自由に動き回りながら, 各サーバーに対してHTTPリクエストをすることができる. 
 
+<div align="center>
 ![arch](https://github.com/thanatoth/edge-simulator/blob/doc/doc/arch.png)
-
+</div>
 
 <div align="center">
 Fig. 1 Our System Model of MEC Architecture
 </div>
 
 
-
+<br>
 シミュレーター上では以下のように表現されている. 以下はサーバーが16個, クライアントが100人の場合で, 青丸がサーバー, 黒丸がクライアントを表している. 
 
 
 
 
-
+<div align="center">
 ![arch_sim](https://github.com/thanatoth/edge-simulator/blob/doc/doc/arch_sim.png)
+</div>
 
 
-
+<br>
 フィールドは区画で区切られており, 各クライアントは同一区画上のサーバーからレコードを取得することを試みる（HTTP GET リクエストをする）. 
 
 
-
+<div align="center">
 ![near](https://github.com/thanatoth/edge-simulator/blob/doc/doc/near.png)
+</div>
 
 
-
+<br>
 各サーバーは独立にキャッシュを持ち, ドキュメントを保持する. 
 
 
