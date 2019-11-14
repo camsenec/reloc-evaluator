@@ -3,11 +3,10 @@ package ClientSide;
 import Constants.Constants;
 import Data.Document;
 import EdgeServer.MecHost;
-import HTTP.HTTPResponseMetaData;
-import Data.DistDataBase;
 import Field.Point2D;
-import Legacy.ServerManager;
+import MetaServer.HostResolver;
 
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;
 
@@ -18,8 +17,6 @@ public class ClientApp {
     private Point2D location; //GPSによって取得
     private int homeServerId; //<application_id, server_id>
     private static final ManagementServiceForClient service = new ManagementServiceForClient();
-
-
 
 
     /**
@@ -76,21 +73,16 @@ public class ClientApp {
     /*
      Only metadata is enough for return value on simulation
      */
-    public HTTPResponseMetaData GET(UUID documentId) {
-        /** 暫定実装（最も近いサーバーからデータを取りに行く **/
-        Document responseBody = this.homeServer.getCollection().get(documentId);
+
+    /*
+    public void GET(int documentId) {
+        MecHost src = HostResolver.hosts.get(applicationId).get(homeServerId);
+        Document response = src.getCollection().get(documentId);
 
         double responseTime = 0.0;
         double transmissionCost = 0.0;
 
         if (responseBody == null) {
-            /**
-             * 暫定実装
-             * need an algorithm (can be contribution)
-             * documentbase : response = document.cachedServer.HTTPRequestForward()
-             **/
-
-            /* create meta data */
             responseTime += 0.1;
             transmissionCost += 0.1;
 
@@ -98,33 +90,30 @@ public class ClientApp {
         } else {
             return new HTTPResponseMetaData(responseTime, transmissionCost);
         }
+    }
+    */
+
+    public Document createDocument(ArrayList cached){
+        UUID uuid = UUID.randomUUID();
+        Document document = new Document(applicationId, uuid);
+        document.setCachedServer(cached);
+        return document;
 
     }
 
-    public HTTPResponseMetaData POST(int applicationId) {
+    public void post(ArrayList cached) {
         /** home serverを取得**/
-        int serverId = this.homeServer.get(applicationId);
+        Document document = createDocument(cached);
+        MecHost dest = HostResolver.hosts.get(applicationId).get(homeServerId);
+        UUID uuid = document.getDocumentId();
+        dest.getCollection().put(uuid, document);
 
-        /*
-          ※マルチスレッドの場合, requested serverに対する排他制御が必要
-        */
-        MecHost requestedServer = ServerManager.serverMap.get(serverId);
+        ArrayList<Integer> cached = document.getCachedServer();
 
-        Document document = new Document(, this.clientId);
-        requestedServer.getCollection().put(uuid, document);
-        //System.out.println("DEBUG" + " " + serverId + " " + requestedServer.getCollection().size());
-        requestedServer.updateRemain(uuid);
-
-        DistDataBase.ids.add(uuid);
-
-        return new HTTPResponseMetaData(0,0);
-    }
-
-
-    @Override
-    public String toString() {
-        return String.format("clientId : %d\t\tlocation : (%6.2f, %6.2f)\t\tNS : %d", clientId, location.getX(), location.getY()
-                ,this.homeServer.getId());
+        for(int serverId : cached){
+            dest = HostResolver.hosts.get(applicationId).get(serverId);
+            dest.getCollection().put(uuid, document);
+        }
     }
 
     public int getApplicationId() {
