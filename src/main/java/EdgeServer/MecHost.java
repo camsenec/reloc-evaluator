@@ -36,19 +36,31 @@ public class MecHost {
     private int applicationId;
     private int serverId; //認証情報
     private int remain;
+    private ConcurrentHashMap<Integer, Document> collection = new ConcurrentHashMap<>();
 
-    public void updateRemain(int applicationId, int documentId){ }
+    public int getApplicationId() {
+        return applicationId;
+    }
+
+    public void setApplicationId(int applicationId) {
+        this.applicationId = applicationId;
+    }
 
     public int getServerId() {
         return serverId;
     }
 
-    public void setServerId(int serverId){ this.serverId = serverId; }
-    public ConcurrentHashMap<Integer, ConcurrentHashMap<Integer, Document>> getCollection() {
-        return collection;
+    public void setServerId(int serverId) {
+        this.serverId = serverId;
     }
 
-    public int getRemain() { return remain;}
+    public int getRemain() {
+        return remain;
+    }
+
+    public void setRemain(int remain) {
+        this.remain = remain;
+    }
 
     @Override
     public String toString() {

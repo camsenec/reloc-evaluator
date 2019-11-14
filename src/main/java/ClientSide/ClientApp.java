@@ -17,7 +17,9 @@ public class ClientApp {
     private int clientId; //認証情報
     private Point2D location; //GPSによって取得
     private int homeServerId; //<application_id, server_id>
-    ManagementServiceForClient service = new ManagementServiceForClient();
+    private static final ManagementServiceForClient service = new ManagementServiceForClient();
+
+
 
 
     /**

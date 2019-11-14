@@ -47,14 +47,14 @@ public class ManagementServiceForServer {
                 String.valueOf(locationX));
 
         RequestBody y = RequestBody.create(MediaType.parse("multipart/form-data"),
-                String.valueOf(locationY);
+                String.valueOf(locationY));
 
         RequestBody capacity_str = RequestBody.create(MediaType.parse("multipart/form-data"),
-                String.valueOf(capacity);
+                String.valueOf(capacity));
 
 
         Call<EdgeServerModel> call = service.postServer(
-                server.applicationId,
+                server.getApplicationId(),
                 x,
                 y,
                 capacity_str);
@@ -66,7 +66,7 @@ public class ManagementServiceForServer {
                 EdgeServerModel responseBody = response.body();
                 try {
                     //idのセット
-                    serverId = responseBody.getServerId();
+                    server.setServerId(responseBody.getServerId());
                 }catch(NullPointerException e){
                     e.printStackTrace();
                 }

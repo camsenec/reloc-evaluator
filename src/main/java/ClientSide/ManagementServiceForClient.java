@@ -35,7 +35,7 @@ public class ManagementServiceForClient {
 
     /**
      * API Call
-     * @param applicationId アプリケーションのid
+     * @param client クライアントのインスタンス
      */
     public void registerToServer(ClientApp client, double locationX, double locationY){
 
@@ -49,7 +49,7 @@ public class ManagementServiceForClient {
 
 
         Call<ClientModel> call = service.postClient(
-                client.applicationId,
+                client.getApplicationId(),
                 x,
                 y);
 
@@ -60,7 +60,7 @@ public class ManagementServiceForClient {
                 ClientModel responseBody = response.body();
                 try {
                     //idのセット
-                    client.clientId = responseBody.getClientId();
+                    client.setClientId(responseBody.getClientId());
                 }catch(NullPointerException e){
                     e.printStackTrace();
                 }
@@ -94,8 +94,8 @@ public class ManagementServiceForClient {
 
 
         Call<ClientModel> call = service.updateLocationOfClient(
-                client.applicationId,
-                client.clientId,
+                client.getApplicationId(),
+                client.getClientId(),
                 x,
                 y);
 
@@ -127,16 +127,15 @@ public class ManagementServiceForClient {
 
 
         Call<ClientModel> call = service.updateHomeOfClient(
-                client.applicationId,
-                client.clientId);
+                client.getApplicationId(),
+                client.getClientId());
 
         call.enqueue(new Callback<ClientModel>() {
             @Override
             public void onResponse(Call<ClientModel> call,
                                    Response<ClientModel> response) {
                 ClientModel responseBody = response.body();
-                int home = responseBody.getHome();
-                client.homeServerId = home;
+                client.setHomeServerId(responseBody.getHome());
             }
 
             @Override
