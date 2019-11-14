@@ -1,6 +1,6 @@
-import ClientSide.Client;
+import ClientSide.ClientApp;
 import Constants.Constants;
-import Meta.ClientManager;
+import Legacy.ClientManager;
 
 public class test {
 
@@ -14,7 +14,7 @@ public class test {
         ClientManager.updateNearestServerOfAllClients();
 
 
-        Client client = ClientManager.clientMap.get(0);
+        ClientApp client = ClientManager.clientMap.get(0);
         System.out.println(client);
         if (Constants.DEBUG) {
             System.out.println("-----------Clients Created-----------");

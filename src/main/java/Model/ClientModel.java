@@ -2,34 +2,34 @@ package Model;
 
 public class ClientModel {
 
-    int application_id;
-    int client_id;
+    int applicationId;
+    int clientId;
     float x;
     float y;
     int home;
 
-    public ClientModel(int application_id, int client_id, float x, float y, int home) {
-        this.application_id = application_id;
-        this.client_id = client_id;
+    public ClientModel(int application_id, int clientId, float x, float y, int home) {
+        this.applicationId = application_id;
+        this.clientId = clientId;
         this.x = x;
         this.y = y;
         this.home = home;
     }
 
-    public int getApplication_id() {
-        return application_id;
+    public int getApplicationId() {
+        return applicationId;
     }
 
-    public void setApplication_id(int application_id) {
-        this.application_id = application_id;
+    public void setApplicationId(int applicationId) {
+        this.applicationId = applicationId;
     }
 
-    public int getClient_id() {
-        return client_id;
+    public int getClientId() {
+        return clientId;
     }
 
-    public void setClient_id(int client_id) {
-        this.client_id = client_id;
+    public void setClientId(int clientId) {
+        this.clientId = clientId;
     }
 
     public float getX() {

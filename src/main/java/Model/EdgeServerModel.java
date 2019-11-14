@@ -1,38 +1,38 @@
 package Model;
 
 public class EdgeServerModel {
-    int application_id;
-    int server_id;
+    int applicationId;
+    int serverId;
     float x;
     float y;
     float capacity;
     float remain;
-    int cluster_id;
+    int clusterId;
 
-    public EdgeServerModel(int application_id, int server_id, float x, float y, float capacity, float remain, int cluster_id) {
-        this.application_id = application_id;
-        this.server_id = server_id;
+    public EdgeServerModel(int applicationId, int serverId, float x, float y, float capacity, float remain, int clusterId) {
+        this.applicationId = applicationId;
+        this.serverId = serverId;
         this.x = x;
         this.y = y;
         this.capacity = capacity;
         this.remain = remain;
-        this.cluster_id = cluster_id;
+        this.clusterId = clusterId;
     }
 
-    public int getApplication_id() {
-        return application_id;
+    public int getApplicationId() {
+        return applicationId;
     }
 
-    public void setApplication_id(int application_id) {
-        this.application_id = application_id;
+    public void setApplicationId(int applicationId) {
+        this.applicationId = applicationId;
     }
 
-    public int getServer_id() {
-        return server_id;
+    public int getServerId() {
+        return serverId;
     }
 
-    public void setServer_id(int server_id) {
-        this.server_id = server_id;
+    public void setServerId(int serverId) {
+        this.serverId = serverId;
     }
 
     public float getX() {
@@ -67,11 +67,11 @@ public class EdgeServerModel {
         this.remain = remain;
     }
 
-    public int getCluster_id() {
-        return cluster_id;
+    public int getClusterId() {
+        return clusterId;
     }
 
-    public void setCluster_id(int cluster_id) {
-        this.cluster_id = cluster_id;
+    public void setClusterId(int clusterId) {
+        this.clusterId = clusterId;
     }
 }
