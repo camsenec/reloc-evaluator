@@ -4,16 +4,6 @@ import ClientSide.ManagementServiceForClient;
 import Constants.Constants;
 import Data.Document;
 import Field.Point2D;
-import Model.EdgeServerModel;
-import Retrofit.EdgeServerAPI;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.RequestBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.util.Random;
 import java.util.UUID;
@@ -29,7 +19,7 @@ import static Constants.Constants.BASE_URL;
     Managementサーバーに送信すること
     これは, ディベロッパーに任せる
 
-    残り容量は基本的にどのプログラミング言語でも可能であろうし,
+    残り容量の取得は基本的にどのプログラミング言語でも可能であろうし,
     Managementサーバーに送信することも容易
 
     'サーバーレス'とかであれば, そのプラットフォームの提供者が組み込むことを想定
@@ -39,7 +29,7 @@ import static Constants.Constants.BASE_URL;
 public class MecHost {
     private int applicationId;
     private int serverId;
-    private Point2D location;
+    private Point2D location = new Point2D();
     private int remain;
     private int capacity;
     private ConcurrentHashMap<UUID, Document> collection = new ConcurrentHashMap<>();
@@ -56,12 +46,11 @@ public class MecHost {
     public void initialize(int capacity){
         //set location
         initializeLocation();
-        //set serverId
-        service.registerToServer(this, location.getX(), location.getY(), capacity);
         //set capacity
         this.capacity = capacity;
-        //set remain
-        this.remain = capacity;
+        //set serverId
+        service.registerToServer(this);
+
     }
 
     private void initializeLocation(){
@@ -71,8 +60,8 @@ public class MecHost {
         Random random = new Random();
         double locationX = Constants.MIN_X + random.nextDouble() * areaLengthX;
         double locationY = Constants.MIN_Y + random.nextDouble() * areaLengthY;
-        location.setX(locationX);
-        location.setY(locationY);
+        this.location.setX(locationX);
+        this.location.setY(locationY);
     }
 
     public void update(){
@@ -110,6 +99,14 @@ public class MecHost {
 
     public void setRemain(int remain) {
         this.remain = remain;
+    }
+
+    public Point2D getLocation() {
+        return location;
+    }
+
+    public int getCapacity() {
+        return capacity;
     }
 
     public ConcurrentHashMap<UUID, Document> getCollection() {

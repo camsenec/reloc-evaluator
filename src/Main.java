@@ -1,6 +1,6 @@
 import ClientSide.Client;
-import HTTP.HTTPResponseMetaData;
-import Log.Log;
+import Legacy.HTTP.HTTPResponseMetaData;
+import Logger.Log;
 import MetaServer.ClientManager;
 import Constants.Constants;
 import EdgeServer.EdgeServer;
@@ -67,7 +67,7 @@ public class Main {
                 client = clientMap.get(clientId);
                 /*適当なサーバーにクライアントがデータをPOSTする*/
                 HTTPResponseMetaData response = client.POST();
-                //Log.outputResponseData(response);
+                //Logger.outputResponseData(response);
             }
             if(i % 3 == 0) {
                 ClientManager.updateLocationOfAllClients();
@@ -81,7 +81,7 @@ public class Main {
         }
 
         /*GETによる評価*/
-        Log.openLogfile();
+        Logger.openLogfile();
         Random random = new Random();
 
         for(int t = 0; t < MAX_T; t++) {
@@ -91,7 +91,7 @@ public class Main {
                 //最も近いサーバーからGETをする（しようとする）
                 UUID documentId = DocumentIds.ids.get(random.nextInt(DocumentIds.ids.size()));
                 HTTPResponseMetaData response = client.GET(documentId);
-                Log.outputResponseData(response);
+                Logger.outputResponseData(response);
             }
 
             if(t % 3 == 0) {

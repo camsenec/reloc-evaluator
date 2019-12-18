@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Service {
 
-    public final static String BASE_URL = "http://127.0.0.1:8000/";
+    public final static String API_ROOT = "http://127.0.0.1:8000/";
 
     public final static OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(10000, TimeUnit.SECONDS)
@@ -16,7 +16,7 @@ public class Service {
             .writeTimeout(10000, TimeUnit.SECONDS).build();
 
     public final static Retrofit retro = new Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(API_ROOT)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build();

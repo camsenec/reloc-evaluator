@@ -12,20 +12,24 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import static Constants.Constants.BASE_URL;
 
 public class ManagementServiceForClient {
 
-    private final OkHttpClient client = new OkHttpClient.Builder()
+    public static ArrayList<ClientApp> clientList = new ArrayList<>();
+
+    private final OkHttpClient okhttp = new OkHttpClient.Builder()
             .connectTimeout(10000, TimeUnit.SECONDS)
             .readTimeout(10000,TimeUnit.SECONDS)
             .writeTimeout(10000, TimeUnit.SECONDS).build();
 
     private final Retrofit retro = new Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .client(client)
+            .client(okhttp)
             .addConverterFactory(GsonConverterFactory.create())
             .build();
 
@@ -37,15 +41,15 @@ public class ManagementServiceForClient {
      * API Call
      * @param client クライアントのインスタンス
      */
-    public void registerToServer(ClientApp client, double locationX, double locationY){
+    public void registerToServer(ClientApp client){
 
         /*------create request body------*/
 
         RequestBody x = RequestBody.create(MediaType.parse("multipart/form-data"),
-                String.valueOf(locationX));
+                String.valueOf(client.getLocation().getX()));
 
         RequestBody y = RequestBody.create(MediaType.parse("multipart/form-data"),
-                String.valueOf(locationY));
+                String.valueOf(client.getLocation().getY()));
 
 
         Call<ClientModel> call = service.postClient(
@@ -53,24 +57,15 @@ public class ManagementServiceForClient {
                 x,
                 y);
 
-        call.enqueue(new Callback<ClientModel>() {
-            @Override
-            public void onResponse(Call<ClientModel> call,
-                                   Response<ClientModel> response) {
-                ClientModel responseBody = response.body();
-                try {
-                    //idのセット
-                    client.setClientId(responseBody.getClientId());
-                }catch(NullPointerException e){
-                    e.printStackTrace();
-                }
-            }
+        try {
+            Response<ClientModel> response = call.execute();
+            System.out.println(response);
+            client.setClientId(response.body().getClientId());
+        }catch(IOException e){
+            e.printStackTrace();
+        }
 
-            @Override
-            public void onFailure(Call<ClientModel> call, Throwable t) {
-                t.printStackTrace();
-            }
-        });
+
 
     }
 
@@ -80,15 +75,15 @@ public class ManagementServiceForClient {
      *
      */
 
-    public void registerLocationToServer(ClientApp client, double locationX, double locationY){
+    public void registerLocationToServer(ClientApp client){
 
         /*------create request body------*/
 
         RequestBody x = RequestBody.create(MediaType.parse("multipart/form-data"),
-                String.valueOf(locationX));
+                String.valueOf(client.getLocation().getX()));
 
         RequestBody y = RequestBody.create(MediaType.parse("multipart/form-data"),
-                String.valueOf(locationY));
+                String.valueOf(client.getLocation().getY()));
 
         /*------create call-------*/
 
@@ -99,19 +94,11 @@ public class ManagementServiceForClient {
                 x,
                 y);
 
-        call.enqueue(new Callback<ClientModel>() {
-            @Override
-            public void onResponse(Call<ClientModel> call,
-                                   Response<ClientModel> response) {
-                ClientModel responseBody = response.body();
-            }
-
-            @Override
-            public void onFailure(Call<ClientModel> call, Throwable t) {
-                t.printStackTrace();
-            }
-        });
-
+        try {
+            call.execute();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -130,24 +117,47 @@ public class ManagementServiceForClient {
                 client.getApplicationId(),
                 client.getClientId());
 
-        call.enqueue(new Callback<ClientModel>() {
-            @Override
-            public void onResponse(Call<ClientModel> call,
-                                   Response<ClientModel> response) {
-                ClientModel responseBody = response.body();
-                client.setHomeServerId(responseBody.getHome());
-            }
-
-            @Override
-            public void onFailure(Call<ClientModel> call, Throwable t) {
-                t.printStackTrace();
-            }
-        });
+        try {
+            Response<ClientModel> response = call.execute();
+            System.out.println(response);
+            client.setHomeServerId(response.body().getHome());
+        }catch(IOException e){
+            e.printStackTrace();
+        }
 
     }
 
-    public EdgeServerAPI getService() {
-        return service;
+    /**
+     * API Call
+     * @param client クライアントのインスタンス
+     */
+    public void registerToServerWithId(ClientApp client){
+
+        /*------create request body------*/
+        RequestBody client_id = RequestBody.create(MediaType.parse("multipart/form-data"),
+                String.valueOf(client.getClientId()));
+
+        RequestBody x = RequestBody.create(MediaType.parse("multipart/form-data"),
+                String.valueOf(client.getLocation().getX()));
+
+        RequestBody y = RequestBody.create(MediaType.parse("multipart/form-data"),
+                String.valueOf(client.getLocation().getY()));
+
+
+        Call<ClientModel> call = service.postClientWithId(
+                client.getApplicationId(),
+                client_id,
+                x,
+                y);
+
+        try {
+            Response<ClientModel> response = call.execute();
+            System.out.println(response);
+            client.setHomeServerId(response.body().getHome());
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+
     }
 
 

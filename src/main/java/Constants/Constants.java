@@ -4,6 +4,8 @@ package Constants;
 
 public class Constants {
     public static final boolean DEBUG = true;
+    public static final boolean CREATE = true;
+    public static final boolean SIMULATION = false;
     public static final String BASE_URL = "http://127.0.0.1:8000/";
 
 

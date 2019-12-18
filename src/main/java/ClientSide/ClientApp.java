@@ -14,23 +14,29 @@ public class ClientApp {
 
     private int applicationId;
     private int clientId; //認証情報
-    private Point2D location; //GPSによって取得
+    private Point2D location = new Point2D(); //GPSによって取得
     private int homeServerId; //<application_id, server_id>
     private static final ManagementServiceForClient service = new ManagementServiceForClient();
 
+
+    public ClientApp(int applicationId) {
+        this.applicationId = applicationId;
+    }
 
     /**
      * 以下, シミュレーターのため（実機では必要ないメソッド群）
      * Must be called when creating client instance
      */
 
+
+
     public void initialize(){
         //set location
         initializeLocation();
-        //set clientId
-        service.registerToServer(this, location.getX(), location.getY());
+        //register to server
+        service.registerToServerWithId(this);
         //set homeServerId
-        service.getHomeServerId(this);
+        //service.getHomeServerId(this);
     }
 
     private void initializeLocation(){
@@ -62,7 +68,7 @@ public class ClientApp {
         if(location.getX() < 0) this.location.setX(location.getX() + areaLengthX);
         if(location.getY() < 0) this.location.setY(location.getY() + areaLengthY);
 
-        service.registerLocationToServer(this, location.getX(), location.getY());
+        service.registerLocationToServer(this);
     }
 
     private void updateHome(){
@@ -70,30 +76,13 @@ public class ClientApp {
         service.getHomeServerId(this);
     }
 
-    /*
-     Only metadata is enough for return value on simulation
+    /**
+     * Documentのcachedフィールドに値を設定する
+     * @param cached
+     * @return
      */
 
-    /*
-    public void GET(int documentId) {
-        MecHost src = HostResolver.hosts.get(applicationId).get(homeServerId);
-        Document response = src.getCollection().get(documentId);
-
-        double responseTime = 0.0;
-        double transmissionCost = 0.0;
-
-        if (responseBody == null) {
-            responseTime += 0.1;
-            transmissionCost += 0.1;
-
-            return new HTTPResponseMetaData(responseTime, transmissionCost);
-        } else {
-            return new HTTPResponseMetaData(responseTime, transmissionCost);
-        }
-    }
-    */
-
-    public Document createDocument(ArrayList cached){
+    public Document createDocument(ArrayList<Integer> cached){
         UUID uuid = UUID.randomUUID();
         Document document = new Document(applicationId, uuid);
         document.setCachedServer(cached);
@@ -101,14 +90,17 @@ public class ClientApp {
 
     }
 
-    public void post(ArrayList cached) {
+    /**
+     * cached serverにdocumentをputする
+     * @param cached
+     */
+
+    public void post(ArrayList<Integer> cached) {
         /** home serverを取得**/
         Document document = createDocument(cached);
         MecHost dest = HostResolver.hosts.get(applicationId).get(homeServerId);
         UUID uuid = document.getDocumentId();
         dest.getCollection().put(uuid, document);
-
-        ArrayList<Integer> cached = document.getCachedServer();
 
         for(int serverId : cached){
             dest = HostResolver.hosts.get(applicationId).get(serverId);
@@ -158,5 +150,28 @@ public class ClientApp {
             //System.out.println("location : " +  this.location + "  NSid : " + homeServer.getServerId() + "  NSloc : " + homeServer.getLocation());
         }
      */
+
+    /*
+     Only metadata is enough for return value on simulation
+     */
+
+    /*
+    public void GET(int documentId) {
+        MecHost src = HostResolver.hosts.get(applicationId).get(homeServerId);
+        Document response = src.getCollection().get(documentId);
+
+        double responseTime = 0.0;
+        double transmissionCost = 0.0;
+
+        if (responseBody == null) {
+            responseTime += 0.1;
+            transmissionCost += 0.1;
+
+            return new HTTPResponseMetaData(responseTime, transmissionCost);
+        } else {
+            return new HTTPResponseMetaData(responseTime, transmissionCost);
+        }
+    }
+    */
 
 }
