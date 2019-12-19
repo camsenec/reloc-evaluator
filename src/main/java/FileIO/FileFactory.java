@@ -21,7 +21,7 @@ public class FileFactory {
     public static void readLogFile(){
 
         /*---------read from local file---------*/
-        try (BufferedReader reader = new BufferedReader(new FileReader("./Log/tx_log.csv"));){
+        try (BufferedReader reader = new BufferedReader(new FileReader("./Log/txLog.csv"));){
             String line;
 
             while ((line = reader.readLine()) != null) {
@@ -35,7 +35,7 @@ public class FileFactory {
                 for (int i = 2; i < data.length; i++) {
                     sendTo.add(Integer.parseInt(data[i]));
                 }
-                TxLog.tx_log.put(client_id, sendTo);
+                TxLog.txLog.put(client_id, sendTo);
             }
 
         } catch (IOException e) {
@@ -43,8 +43,8 @@ public class FileFactory {
         }
 
         if(DEBUG) {
-            for (Integer key : TxLog.tx_log.keySet()) {
-                ArrayList tmp = TxLog.tx_log.get(key);
+            for (Integer key : TxLog.txLog.keySet()) {
+                ArrayList tmp = TxLog.txLog.get(key);
                 System.out.print(key + ":");
                 for (Object sendto : tmp) {
                     System.out.print(sendto);
@@ -53,7 +53,7 @@ public class FileFactory {
                 }
                 System.out.print("\n");
             }
-            System.out.println(TxLog.tx_log.size());
+            System.out.println(TxLog.txLog.size());
         }
 
     }

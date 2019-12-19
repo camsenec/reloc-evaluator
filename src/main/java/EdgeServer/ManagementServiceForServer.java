@@ -7,10 +7,12 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import retrofit2.Call;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -18,8 +20,8 @@ import static Constants.Constants.BASE_URL;
 
 public class ManagementServiceForServer {
     //<application_id -> document_idで指定*/
-    public final ConcurrentHashMap<Integer, ConcurrentHashMap<Integer, Document>> collection = new ConcurrentHashMap<>();
-    public final ConcurrentHashMap<Integer, ConcurrentHashMap<Integer, MecHost>> serverMap = new ConcurrentHashMap<>();
+    public static final HashMap<Integer, Document> collection = new HashMap<>();
+    public static final HashMap<Integer, MecHost> serverMap = new HashMap<>();
 
     private final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(10000, TimeUnit.SECONDS)
@@ -37,32 +39,33 @@ public class ManagementServiceForServer {
 
     /**
      * API Call
-     * @param server MECHostのインスタンス
+     * @param host MECHostのインスタンス
      */
-    public void registerToServer(MecHost server){
+    public void registerToServer(MecHost host){
 
         /*------create request body------*/
 
         RequestBody x = RequestBody.create(MediaType.parse("multipart/form-data"),
-                String.valueOf(server.getLocation().getX()));
+                String.valueOf(host.getLocation().getX()));
 
         RequestBody y = RequestBody.create(MediaType.parse("multipart/form-data"),
-                String.valueOf(server.getLocation().getY()));
+                String.valueOf(host.getLocation().getY()));
 
         RequestBody capacity_body = RequestBody.create(MediaType.parse("multipart/form-data"),
-                String.valueOf(server.getCapacity()));
+                String.valueOf(host.getCapacity()));
 
         System.out.println(x);
 
 
         Call<EdgeServerModel> call = service.postServer(
-                server.getApplicationId(),
+                host.getApplicationId(),
                 x,
                 y,
                 capacity_body);
 
         try {
-            call.execute();
+            Response<EdgeServerModel> response = call.execute();
+            host.setServerId(response.body().getServerId());
         }catch(IOException e){
             e.printStackTrace();
         }

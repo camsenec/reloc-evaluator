@@ -19,8 +19,9 @@ public class ClientApp {
     private static final ManagementServiceForClient service = new ManagementServiceForClient();
 
 
-    public ClientApp(int applicationId) {
+    public ClientApp(int applicationId, int clientId) {
         this.applicationId = applicationId;
+        this.clientId = clientId;
     }
 
     /**
@@ -76,27 +77,28 @@ public class ClientApp {
         service.getHomeServerId(this);
     }
 
+
     /**
      * Documentのcachedフィールドに値を設定する
-     * @param cached
-     * @return
      */
 
+    /*
     public Document createDocument(ArrayList<Integer> cached){
         UUID uuid = UUID.randomUUID();
-        Document document = new Document(applicationId, uuid);
+        Document document = new Document(applicationId);
         document.setCachedServer(cached);
         return document;
 
     }
+    */
+
 
     /**
      * cached serverにdocumentをputする
-     * @param cached
      */
 
+    /*
     public void post(ArrayList<Integer> cached) {
-        /** home serverを取得**/
         Document document = createDocument(cached);
         MecHost dest = HostResolver.hosts.get(applicationId).get(homeServerId);
         UUID uuid = document.getDocumentId();
@@ -107,6 +109,8 @@ public class ClientApp {
             dest.getCollection().put(uuid, document);
         }
     }
+    */
+
 
     public int getApplicationId() {
         return applicationId;

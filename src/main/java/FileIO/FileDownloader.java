@@ -46,7 +46,7 @@ public class FileDownloader {
             DataOutputStream dataOutStream
                     = new DataOutputStream(
                     new BufferedOutputStream(
-                            new FileOutputStream("./Log/tx_log.csv")));
+                            new FileOutputStream("./Log/txLog.csv")));
 
             // Read Data
             byte[] b = new byte[4096];

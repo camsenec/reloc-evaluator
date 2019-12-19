@@ -7,12 +7,19 @@ public class Document {
     /** METADATA **/
     private int applicationId;
     private UUID documentId;
-    private ArrayList<Integer> cachedServer = new ArrayList<>();
-    private int size = 1;
+    private int size;
 
-    public Document(int applicationId, UUID documentId) {
+    /*
+      private ArrayList<Integer> cachedServer = new ArrayList<>();
+    */
+
+    public Document(int applicationId, int documentId) {
         this.applicationId = applicationId;
         this.documentId = documentId;
+    }
+
+    public void initialize(int docSize){
+        this.size = 100;
     }
 
     public int getApplicationId() {

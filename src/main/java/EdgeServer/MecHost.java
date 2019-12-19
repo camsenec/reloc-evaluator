@@ -32,7 +32,7 @@ public class MecHost {
     private Point2D location = new Point2D();
     private int remain;
     private int capacity;
-    private ConcurrentHashMap<UUID, Document> collection = new ConcurrentHashMap<>();
+    private HashMap<Integer, Document> collection = new HashMap<>();
 
     private static final ManagementServiceForServer service = new ManagementServiceForServer();
 
@@ -68,13 +68,9 @@ public class MecHost {
         updateRemain();
     }
 
-    private void updateRemain(){
-        long total_size = 0;
-
-        for(UUID documentId : collection.keySet()){
-            total_size += collection.get(documentId).getSize();
-        }
-
+    public void updateState(int sizeOfDoc){
+        this.remain+=sizeOfDoc;
+        this.capacity-=sizeOfDoc;
     }
 
     public int getApplicationId() {

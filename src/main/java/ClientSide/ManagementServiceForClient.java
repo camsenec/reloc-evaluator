@@ -14,13 +14,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import static Constants.Constants.BASE_URL;
 
 public class ManagementServiceForClient {
 
-    public static ArrayList<ClientApp> clientList = new ArrayList<>();
+    public static final HashMap<Integer, ClientApp> clientMap = new HashMap<>();
 
     private final OkHttpClient okhttp = new OkHttpClient.Builder()
             .connectTimeout(10000, TimeUnit.SECONDS)
@@ -152,7 +153,6 @@ public class ManagementServiceForClient {
 
         try {
             Response<ClientModel> response = call.execute();
-            System.out.println(response);
             client.setHomeServerId(response.body().getHome());
         }catch(IOException e){
             e.printStackTrace();
