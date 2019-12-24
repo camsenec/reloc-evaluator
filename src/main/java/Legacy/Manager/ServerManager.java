@@ -44,7 +44,7 @@ public class ServerManager {
 
     public static void printRemainOfAllServers(){
         for (int serverId : serverMap.keySet()) {
-            System.out.println(serverMap.get(serverId).getRemain());
+            System.out.println(serverMap.get(serverId).getUsed());
         }
     }
 

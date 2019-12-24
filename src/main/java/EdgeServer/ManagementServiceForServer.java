@@ -13,7 +13,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import static Constants.Constants.BASE_URL;
@@ -54,8 +53,6 @@ public class ManagementServiceForServer {
         RequestBody capacity_body = RequestBody.create(MediaType.parse("multipart/form-data"),
                 String.valueOf(host.getCapacity()));
 
-        System.out.println(x);
-
 
         Call<EdgeServerModel> call = service.postServer(
                 host.getApplicationId(),
@@ -65,7 +62,9 @@ public class ManagementServiceForServer {
 
         try {
             Response<EdgeServerModel> response = call.execute();
-            host.setServerId(response.body().getServerId());
+            System.out.println(response.body());
+            host.setServerId(response.body().getServer_id());
+            System.out.println("Server " + host.getServerId() + " registered");
         }catch(IOException e){
             e.printStackTrace();
         }

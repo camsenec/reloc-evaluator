@@ -8,17 +8,14 @@ import Constants.Constants;
 import FileIO.FileDownloader;
 import FileIO.FileFactory;
 
-import java.lang.invoke.MutableCallSite;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static Constants.Constants.BASE_URL;
 import static Logger.TxLog.txLog;
 import static Logger.TxLog.txLogDocs;
 
 public class Main {
-    public static int MAX_T = 10;
 
     public static void main(String args[]){
 
@@ -52,18 +49,19 @@ public class Main {
             sizeOfDocs = Integer.parseInt(args[3]);
         }
 
-        FileDownloader.downlaodLogFile(BASE_URL + "simulation/out/txLog.csv");
-        FileFactory.readLogFile();
+        FileDownloader.downlaodLogFile(BASE_URL + "simulation/out/tx_log.csv");
+        FileFactory.loadLogFile("txLog.csv");
 
-        if(Constants.CREATE) {
 
-            /*
-             /*
-                1. インスタンスの作成
-                2. 初期化
-                3. シミュレーション用のコレクションに追加
-             */
 
+        /*
+         /*
+            1. インスタンスの作成
+            2. 初期化
+            3. シミュレーション用のコレクションに追加
+         */
+
+        if(Constants.UPLOAD) {
             /* 手順1 : サーバーの管理サーバーへの登録(同期実行)*/
             for (int i = 0; i < numberOfServers; i++) {
                 MecHost host = new MecHost(application_id);
@@ -73,34 +71,36 @@ public class Main {
 
 
             /* 手順2 : クライアントの管理サーバーへの登録(同期実行)*/
-            int count = 0;
-            for(Integer client_id : txLog.keySet()) {
-                ClientApp client = new ClientApp(application_id, client_id);
+            ClientApp client;
+            for (Integer client_id : txLog.keySet()) {
+                client = new ClientApp(application_id, client_id);
                 client.initialize();
-                ManagementServiceForClient.clientMap.put(client.getClientId(), client);
+                ManagementServiceForClient.clientMap.putIfAbsent(client.getClientId(), client);
 
-                /*
-                ++count;
-                if(count > 10){
-                    break;
+                ArrayList<Integer> clientList = txLog.get(client_id);
+                for (int client_id_2 : clientList) {
+                    client = new ClientApp(application_id, client_id_2);
+                    client.initialize();
+                    ManagementServiceForClient.clientMap.putIfAbsent(client.getClientId(), client);
                 }
-
-                 */
             }
+        }else{
+            FileFactory.loadServerState("serverCache.csv", capacityOfServers);
+            FileFactory.loadClientState("clientCache.csv");
+        }
 
-            /*手順3 : ドキュメントの生成*/
-            int document_id = 1;
-            for(Integer client_id : txLog.keySet()){
-                ArrayList<Integer> docList = new ArrayList<>();
-                for(int i = 0; i < numberOfDocsPerClients; i++){
-                    Document document = new Document(application_id, document_id);
-                    document.initialize(sizeOfDocs);
-                    DataBase.dataBase.put(document_id, document);
+        /*手順3 : ドキュメントの生成（ローカル）*/
+        int document_id = 1;
+        for(Integer client_id : txLog.keySet()){
+            ArrayList<Integer> docList = new ArrayList<>();
+            for(int i = 0; i < numberOfDocsPerClients; i++){
+                Document document = new Document(application_id, document_id);
+                document.initialize(sizeOfDocs);
+                DataBase.dataBase.put(document_id, document);
 
-                    docList.add(document_id++);
-                }
-                txLogDocs.put(client_id, docList);
+                docList.add(document_id++);
             }
+            txLogDocs.put(client_id, docList);
         }
 
         if(Constants.SIMULATION) {
@@ -124,12 +124,27 @@ public class Main {
                         ClientApp client = ManagementServiceForClient.clientMap.get(sendToId);
                         int homeId = client.getHomeServerId();
                         MecHost server = ManagementServiceForServer.serverMap.get(homeId);
-                        server.getCollection().put(document.getDocumentId(), document);
-                        server.updateState(document.getSize());
+                        //重複の場合はコレクションに追加しない
+                        Document isExist = server.getCollection().putIfAbsent(document.getDocumentId(), document);
+                        //新規にドキュメントをおいた場合は, serverのstateを更新
+                        if(isExist == null) {
+                            server.updateState(document.getSize());
+                        }else{
+                            System.out.println("this document has already been stored!");
+                        }
                     }
-
-
                 }
+            }
+        }
+        if(Constants.SAVE){
+            FileFactory.saveServerState();
+            FileFactory.saveClientState();
+        }
+
+        if(Constants.LOG){
+            for(int serverId : ManagementServiceForServer.serverMap.keySet()){
+                MecHost server = ManagementServiceForServer.serverMap.get(serverId);
+                System.out.println(server);
             }
         }
 

@@ -36,8 +36,10 @@ public class ClientApp {
         initializeLocation();
         //register to server
         service.registerToServerWithId(this);
-        //set homeServerId
-        //service.getHomeServerId(this);
+        /*
+        set homeServerId
+        service.getHomeServerId(this);
+        */
     }
 
     private void initializeLocation(){
@@ -151,7 +153,7 @@ public class ClientApp {
         public void updateNearestServer(int application_id) {
             int clientId = ServerManager.findNearestServer(this.location);
             this.homeServer.put(application_id, ServerManager.serverMap.get(clientId);
-            //System.out.println("location : " +  this.location + "  NSid : " + homeServer.getServerId() + "  NSloc : " + homeServer.getLocation());
+            //System.out.println("location : " +  this.location + "  NSid : " + homeServer.getServer_id() + "  NSloc : " + homeServer.getLocation());
         }
      */
 

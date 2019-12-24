@@ -7,13 +7,12 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import java.io.EOFException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -120,7 +119,6 @@ public class ManagementServiceForClient {
 
         try {
             Response<ClientModel> response = call.execute();
-            System.out.println(response);
             client.setHomeServerId(response.body().getHome());
         }catch(IOException e){
             e.printStackTrace();
@@ -154,6 +152,9 @@ public class ManagementServiceForClient {
         try {
             Response<ClientModel> response = call.execute();
             client.setHomeServerId(response.body().getHome());
+            System.out.println(response.body());
+            System.out.println("Client " + client.getClientId() + " registered");
+        }catch(EOFException e){
         }catch(IOException e){
             e.printStackTrace();
         }

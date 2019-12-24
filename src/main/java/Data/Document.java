@@ -6,7 +6,7 @@ import java.util.UUID;
 public class Document {
     /** METADATA **/
     private int applicationId;
-    private UUID documentId;
+    private int documentId;
     private int size;
 
     /*
@@ -30,20 +30,12 @@ public class Document {
         this.applicationId = applicationId;
     }
 
-    public UUID getDocumentId() {
+    public int getDocumentId() {
         return documentId;
     }
 
-    public void setDocumentId(UUID documentId) {
+    public void setDocumentId(int documentId) {
         this.documentId = documentId;
-    }
-
-    public ArrayList<Integer> getCachedServer() {
-        return cachedServer;
-    }
-
-    public void setCachedServer(ArrayList<Integer> cachedServer) {
-        this.cachedServer = cachedServer;
     }
 
     public int getSize() {

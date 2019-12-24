@@ -1,16 +1,12 @@
 package EdgeServer;
 
-import ClientSide.ManagementServiceForClient;
+
 import Constants.Constants;
 import Data.Document;
 import Field.Point2D;
 
+import java.util.HashMap;
 import java.util.Random;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
-
-import static Constants.Constants.BASE_URL;
 
 /*
     サーバー上で動くサーバプログラムを想定
@@ -30,7 +26,7 @@ public class MecHost {
     private int applicationId;
     private int serverId;
     private Point2D location = new Point2D();
-    private int remain;
+    private int used;
     private int capacity;
     private HashMap<Integer, Document> collection = new HashMap<>();
 
@@ -44,10 +40,11 @@ public class MecHost {
     }
 
     public void initialize(int capacity){
-        //set location
-        initializeLocation();
         //set capacity
         this.capacity = capacity;
+        this.used = 0;
+        //set location
+        initializeLocation();
         //set serverId
         service.registerToServer(this);
 
@@ -64,13 +61,9 @@ public class MecHost {
         this.location.setY(locationY);
     }
 
-    public void update(){
-        updateRemain();
-    }
-
     public void updateState(int sizeOfDoc){
-        this.remain+=sizeOfDoc;
-        this.capacity-=sizeOfDoc;
+        this.used += sizeOfDoc;
+        this.capacity -= sizeOfDoc;
     }
 
     public int getApplicationId() {
@@ -89,28 +82,43 @@ public class MecHost {
         this.serverId = serverId;
     }
 
-    public int getRemain() {
-        return remain;
+    public int getUsed() {
+        return used;
     }
 
-    public void setRemain(int remain) {
-        this.remain = remain;
+    public void setUsed(int used) {
+        this.used = used;
     }
 
     public Point2D getLocation() {
         return location;
     }
 
+    public void setLocation(Point2D location) {
+        this.location = location;
+    }
+
     public int getCapacity() {
         return capacity;
     }
 
-    public ConcurrentHashMap<UUID, Document> getCollection() {
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public HashMap<Integer, Document> getCollection() {
         return collection;
     }
 
     @Override
     public String toString() {
-        return String.format("serverId : %d\t\tlocation : (%6.2f, %6.2f)", serverId);
+        return "MecHost{" +
+                "applicationId=" + applicationId +
+                ", serverId=" + serverId +
+                ", location=" + location +
+                ", used=" + used +
+                ", capacity=" + capacity +
+                ", collection=" + collection +
+                '}';
     }
 }

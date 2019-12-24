@@ -110,8 +110,8 @@ edge-server
 ### 準備
 
 1. フィールドを用意する（現状は1km × 1km)
-2. エッジサーバー (`serverId`, `location`, `samegroupServers` , `performanceLevel(性能)`,`capacity(容量)`, `remain(残り容量)`, `collection`をプロパティとして持つ)  のインスタンスをフィールド上に, 格子状に配置する
-3. クライアント（`serverId`,` location`, `nearestServer(最も近くにあるサーバー. クライアントはこのサーバーに対してHTTPリクエストを行う)`をプロパティとしてもつ）のインスタンスをフィールド上に, ランダムに配置する. 
+2. エッジサーバー (`server_id`, `location`, `samegroupServers` , `performanceLevel(性能)`,`capacity(容量)`, `used(残り容量)`, `collection`をプロパティとして持つ)  のインスタンスをフィールド上に, 格子状に配置する
+3. クライアント（`server_id`,` location`, `nearestServer(最も近くにあるサーバー. クライアントはこのサーバーに対してHTTPリクエストを行う)`をプロパティとしてもつ）のインスタンスをフィールド上に, ランダムに配置する. 
 4. 他に, クラウドサーバー（`collection`をプロパティとして持つ）, クライアント管理用サーバー, サーバー管理用サーバーを配置する. 
 
 

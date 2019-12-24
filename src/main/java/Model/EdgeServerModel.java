@@ -1,38 +1,38 @@
 package Model;
 
 public class EdgeServerModel {
-    int applicationId;
-    int serverId;
-    float x;
-    float y;
-    float capacity;
-    float remain;
-    int clusterId;
+    private int application_id;
+    private int server_id;
+    private float x;
+    private float y;
+    private float capacity;
+    private float used;
+    private int cluster_id;
 
-    public EdgeServerModel(int applicationId, int serverId, float x, float y, float capacity, float remain, int clusterId) {
-        this.applicationId = applicationId;
-        this.serverId = serverId;
+    public EdgeServerModel(int application_id, int serverId, float x, float y, float capacity, float used, int cluster_id) {
+        this.application_id = application_id;
+        this.server_id = serverId;
         this.x = x;
         this.y = y;
         this.capacity = capacity;
-        this.remain = remain;
-        this.clusterId = clusterId;
+        this.used = used;
+        this.cluster_id = cluster_id;
     }
 
-    public int getApplicationId() {
-        return applicationId;
+    public int getApplication_id() {
+        return application_id;
     }
 
-    public void setApplicationId(int applicationId) {
-        this.applicationId = applicationId;
+    public void setApplication_id(int application_id) {
+        this.application_id = application_id;
     }
 
-    public int getServerId() {
-        return serverId;
+    public int getServer_id() {
+        return server_id;
     }
 
-    public void setServerId(int serverId) {
-        this.serverId = serverId;
+    public void setServer_id(int server_id) {
+        this.server_id = server_id;
     }
 
     public float getX() {
@@ -59,19 +59,32 @@ public class EdgeServerModel {
         this.capacity = capacity;
     }
 
-    public float getRemain() {
-        return remain;
+    public float getUsed() {
+        return used;
     }
 
-    public void setRemain(float remain) {
-        this.remain = remain;
+    public void setUsed(float used) {
+        this.used = used;
     }
 
-    public int getClusterId() {
-        return clusterId;
+    public int getCluster_id() {
+        return cluster_id;
     }
 
-    public void setClusterId(int clusterId) {
-        this.clusterId = clusterId;
+    public void setCluster_id(int cluster_id) {
+        this.cluster_id = cluster_id;
+    }
+
+    @Override
+    public String toString() {
+        return "EdgeServerModel{" +
+                "application_id=" + application_id +
+                ", server_id=" + server_id +
+                ", x=" + x +
+                ", y=" + y +
+                ", capacity=" + capacity +
+                ", used=" + used +
+                ", cluster_id=" + cluster_id +
+                '}';
     }
 }

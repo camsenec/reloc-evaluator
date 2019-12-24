@@ -1,5 +1,11 @@
 package FileIO;
+import ClientSide.ClientApp;
+import ClientSide.ManagementServiceForClient;
+import EdgeServer.ManagementServiceForServer;
+import EdgeServer.MecHost;
+import Field.Point2D;
 import Logger.TxLog;
+import com.sun.security.ntlm.Client;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -18,11 +24,12 @@ public class FileFactory {
     /**
      * read from local file
      */
-    public static void readLogFile(){
+    public static void loadLogFile(String fileName){
 
         /*---------read from local file---------*/
-        try (BufferedReader reader = new BufferedReader(new FileReader("./Log/txLog.csv"));){
+        try (BufferedReader reader = new BufferedReader(new FileReader("./Log/" + fileName))){
             String line;
+            int count = 0;
 
             while ((line = reader.readLine()) != null) {
                 line = line.replace("\"[", "");
@@ -36,7 +43,9 @@ public class FileFactory {
                     sendTo.add(Integer.parseInt(data[i]));
                 }
                 TxLog.txLog.put(client_id, sendTo);
+                count++;
             }
+            System.out.println(count + " Transactions were loaded");
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -58,64 +67,138 @@ public class FileFactory {
 
     }
 
+    public static void loadServerState(String fileName, int capacityOfServer){
+        try (BufferedReader reader = new BufferedReader(new FileReader("./Cache/" + fileName))){
+            String line;
+            int count = 0;
+
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",", -1);
+
+                int application_id = Integer.parseInt(data[0]);
+                int server_id = Integer.parseInt(data[1]);
+                double x = Double.parseDouble(data[2]);
+                double y = Double.parseDouble(data[3]);
+                Point2D location = new Point2D(x,y);
+
+                MecHost server = new MecHost(application_id);
+                server.setServerId(server_id);
+                server.setLocation(location);
+                server.setCapacity(capacityOfServer);
+                ManagementServiceForServer.serverMap.put(server.getServerId(), server);
+                count++;
+            }
+            System.out.println(count + " Servers were loaded");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void loadClientState(String fileName){
+        try (BufferedReader reader = new BufferedReader(new FileReader("./Cache/" + fileName))){
+            String line;
+            int count = 0;
+
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",", -1);
+
+                int application_id = Integer.parseInt(data[0]);
+                int client_id = Integer.parseInt(data[1]);
+                double x = Double.parseDouble(data[2]);
+                double y = Double.parseDouble(data[3]);
+                int home = Integer.parseInt(data[4]);
+                Point2D location = new Point2D(x,y);
+                ClientApp client = new ClientApp(application_id, client_id);
+                client.setLocation(location);
+                client.setHomeServerId(home);
+                ManagementServiceForClient.clientMap.put(client.getClientId(), client);
+                count++;
+            }
+            System.out.println(count + " Clients were loaded");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * write to local file
      */
 
-    /*
-    public static void writer(Context context, ArrayList<MyTriangle> triangles){
-
+    public static void saveServerState(){
         try {
 
-            System.out.println(context.getFilesDir().getPath());
-            FileOutputStream fileStream = context.openFileOutput(
-                    fileNameOutput, Context.MODE_PRIVATE);
-            PrintWriter pw = new PrintWriter(new OutputStreamWriter(fileStream,"UTF-8"));
+            // 出力ファイルの作成
+            FileWriter f = new FileWriter("./Cache/serverCache.csv", false);
+            PrintWriter p = new PrintWriter(new BufferedWriter(f));
 
-            float JCoupling;
+            /*
+            ・application_id
+            ・server_id
+            ・X
+            ・Y
 
-            for(MyTriangle triangleI : triangles){
-                for(MyTriangle triangleJ : triangles){
-                    if(triangleI.getNextTriangles().contains(triangleJ)) {
-                        JCoupling = -1;
-                    }else {
-                        JCoupling = 0;
-                    }
-
-                    if(!triangleI.equals(triangleJ)) {
-
-                        pw.write(String.format(Locale.US,
-                                "%d,%d,%d,%d,%f\n",
-                                triangleI.getSiteX(),
-                                triangleI.getSiteY(),
-                                triangleJ.getSiteX(),
-                                triangleJ.getSiteY(),
-                                JCoupling
-                        ));
-
-
-
-                    if(Math.abs(JCoupling - (-1)) < EPS){
-                        System.out.println(String.format(Locale.US,
-                                "%d,%d,%d,%d,%f",
-                                triangleI.getSiteX(),
-                                triangleI.getSiteY(),
-                                triangleJ.getSiteX(),
-                                triangleJ.getSiteY(),
-                                JCoupling));
-                    }
-
-                    }
-                }
+             */
+            for(int serverId : ManagementServiceForServer.serverMap.keySet()){
+                MecHost server = ManagementServiceForServer.serverMap.get(serverId);
+                p.print(server.getApplicationId());
+                p.print(",");
+                p.print(server.getServerId());
+                p.print(",");
+                p.print(server.getLocation().getX());
+                p.print(",");
+                p.print(server.getLocation().getY());
+                p.println();
             }
-            System.out.println("WRITE DONE");
+            p.close();
 
-            pw.close();
+            System.out.println("Server states are saved to file！");
 
-        } catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
-    */
+
+    public static void saveClientState(){
+        try {
+
+            // 出力ファイルの作成
+            FileWriter f = new FileWriter("./Cache/clientCache.csv", false);
+            PrintWriter p = new PrintWriter(new BufferedWriter(f));
+
+            /*
+            ・application_id
+            ・server_id
+            ・X
+            ・Y
+
+             */
+            for(int clientId : ManagementServiceForClient.clientMap.keySet()){
+                ClientApp client = ManagementServiceForClient.clientMap.get(clientId);
+                p.print(client.getApplicationId());
+                p.print(",");
+                p.print(client.getClientId());
+                p.print(",");
+                p.print(client.getLocation().getX());
+                p.print(",");
+                p.print(client.getLocation().getY());
+                p.print(",");
+                p.print(client.getHomeServerId());
+
+                p.println();
+            }
+            p.close();
+
+            System.out.println("Client states are saved to file！");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 
 }
+
+
