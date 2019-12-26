@@ -3,11 +3,12 @@ package Constants;
 /* 設定ファイル(Plhamのようにjson的なものを渡したい*/
 
 public class Constants {
-    public static final boolean DEBUG = false;
-    public static final boolean UPLOAD = true;
-    public static final boolean SIMULATION = true;
-    public static final boolean LOG = true;
-    public static final boolean SAVE = true;
+    public static boolean DEBUG = false;
+    public static boolean UPLOAD = true;
+    public static boolean SIMULATION = true;
+    public static boolean LOG = true;
+    public static boolean SAVE = true;
+    public static boolean RESULT = true;
 
     public static final String BASE_URL = "http://127.0.0.1:8000/";
 
@@ -17,11 +18,14 @@ public class Constants {
     public static final double MAX_X = 100;
     public static final double MAX_Y = 100;
 
+    public static final int INF = 10000000;
+
     public static void first(){
       UPLOAD = true;
       SIMULATION = true;
       LOG = true;
       SAVE = true;
+      RESULT = true;
     }
 
     public static void notFirst(){
@@ -29,6 +33,7 @@ public class Constants {
       SIMULATION = true;
       LOG = true;
       SAVE = false;
+      RESULT = true;
     }
 
 

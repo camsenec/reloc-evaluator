@@ -5,7 +5,7 @@ import EdgeServer.ManagementServiceForServer;
 import EdgeServer.MecHost;
 import Field.Point2D;
 import Logger.TxLog;
-import com.sun.security.ntlm.Client;
+import Result.Result;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -14,12 +14,6 @@ import static Constants.Constants.DEBUG;
 
 public class FileFactory {
 
-    private static double EPS = 1e-5;
-
-    /**
-     * fileName : データの読み書きに用いるファイル
-     * customView : モデルを参照する先のビュー
-     */
 
     /**
      * read from local file
@@ -116,6 +110,7 @@ public class FileFactory {
                 count++;
             }
             System.out.println(count + " Clients were loaded");
+            Result.numberOfClient = count;
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -197,6 +192,55 @@ public class FileFactory {
             e.printStackTrace();
         }
 
+    }
+
+    public static void saveResult(){
+        try {
+            // 出力ファイルの作成
+            FileWriter f = new FileWriter("./Result/result.csv", true);
+            PrintWriter p = new PrintWriter(new BufferedWriter(f));
+
+            /*
+            public static double meanOfUsed = 0;
+            public static double minOfUsed = 0;
+            public static double maxOfUsed = 0;
+            public static double rateOfSaved = 0;
+
+            public static int kindOfDocument = 0;
+            public static int numberOfCachedDocument = 0;
+            public static int numberOfSender = 0;
+            public static int numberOfClient = 0;
+            public static int saved = 0;
+             */
+
+            p.print(Result.numberOfSender);
+            p.print(",");
+            p.print(Result.numberOfClient);
+            p.print(",");
+            p.print(Result.kindOfDocument);
+            p.print(",");
+            p.print(Result.numberOfCachedDocument);
+            p.print(",");
+            p.printf("%.2f",Result.meanOfUsed);
+            p.print(",");
+            p.printf("%.2f",Result.meanOfCachedDocs);
+            p.print(",");
+            p.print(Result.minOfUsed);
+            p.print(",");
+            p.print(Result.maxOfUsed);
+            p.print(",");
+            p.print(Result.saved);
+            p.print(",");
+            p.printf("%.10f", Result.rateOfSaved);
+
+            p.println();
+            p.close();
+
+            System.out.println("Result are saved to file！");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

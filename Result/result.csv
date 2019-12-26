@@ -1,0 +1,2 @@
+numberOfSender,numberOfClient,kindOfDocument,numberOfCachedDocument,meanOfUsed,meanOfCachedDocs,minOfUsed,maxOfUsed,saved,rateOfsaved
+914,1865,2742,22440,21480.00,214.80,1800.0,126000.0,960,0.0427807487
