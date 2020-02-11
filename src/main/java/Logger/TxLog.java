@@ -9,4 +9,6 @@ public class TxLog {
     public static final HashMap<Integer, ArrayList<Integer>> txLog = new HashMap<>();
     /* {送信元Id : 送信候補Documentのリスト} */
     public static final HashMap<Integer, ArrayList<Integer>> txLogDocs = new HashMap<>();
+
+    public static final HashMap<Integer, ArrayList<Integer>> rxLogDocs = new HashMap<>();
 }

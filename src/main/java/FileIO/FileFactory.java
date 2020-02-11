@@ -6,6 +6,7 @@ import EdgeServer.MecHost;
 import Field.Point2D;
 import Logger.TxLog;
 import Result.Result;
+import Result.Metric;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -102,10 +103,12 @@ public class FileFactory {
                 double x = Double.parseDouble(data[2]);
                 double y = Double.parseDouble(data[3]);
                 int home = Integer.parseInt(data[4]);
+                int weight = Integer.parseInt(data[5]);
                 Point2D location = new Point2D(x,y);
                 ClientApp client = new ClientApp(application_id, client_id);
                 client.setLocation(location);
                 client.setHomeServerId(home);
+                client.setWeight(weight);
                 ManagementServiceForClient.clientMap.put(client.getClientId(), client);
                 count++;
             }
@@ -181,6 +184,8 @@ public class FileFactory {
                 p.print(client.getLocation().getY());
                 p.print(",");
                 p.print(client.getHomeServerId());
+                p.print(",");
+                p.print(client.getWeight());
 
                 p.println();
             }
@@ -232,6 +237,30 @@ public class FileFactory {
             p.print(Result.saved);
             p.print(",");
             p.printf("%.10f", Result.rateOfSaved);
+
+            p.println();
+            p.close();
+
+            System.out.println("Result are saved to file！");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void saveMetric(){
+        try {
+            // 出力ファイルの作成
+            FileWriter f = new FileWriter("./Result/result_2.csv", true);
+            PrintWriter p = new PrintWriter(new BufferedWriter(f));
+
+            p.printf("%.4f",Metric.MET_1);
+            p.print(",");
+            p.printf("%.4f",Metric.MET_2);
+            p.print(",");
+            p.printf("%.4f",Metric.MET_3);
+            p.print(",");
+            p.printf("%.4f",Metric.MET_4);
 
             p.println();
             p.close();

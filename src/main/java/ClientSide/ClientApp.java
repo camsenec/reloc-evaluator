@@ -18,6 +18,16 @@ public class ClientApp {
     private int homeServerId; //<application_id, server_id>
     private static final ManagementServiceForClient service = new ManagementServiceForClient();
 
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+
+    private int weight = 0;
+
 
     public ClientApp(int applicationId, int clientId) {
         this.applicationId = applicationId;
@@ -29,17 +39,26 @@ public class ClientApp {
      * Must be called when creating client instance
      */
 
-
+    public void addWeight(int added){
+        this.weight += added;
+    }
 
     public void initialize(){
         //set location
         initializeLocation();
         //register to server
         service.registerToServerWithId(this);
-        /*
-        set homeServerId
+    }
+
+    public void initialize_loc(double locationX, double locationY){
+        this.location.setX(locationX);
+        this.location.setY(locationY);
+        //register to server
+        service.registerToServerWithId(this);
+    }
+
+    public void relocate(){
         service.getHomeServerId(this);
-        */
     }
 
     private void initializeLocation(){

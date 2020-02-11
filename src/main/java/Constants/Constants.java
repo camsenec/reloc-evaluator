@@ -6,9 +6,11 @@ public class Constants {
     public static boolean DEBUG = false;
     public static boolean UPLOAD = true;
     public static boolean SIMULATION = true;
+    public static boolean TEST = true;
     public static boolean LOG = true;
     public static boolean SAVE = true;
     public static boolean RESULT = true;
+    public static boolean RESET = true;
 
     public static final String BASE_URL = "http://127.0.0.1:8000/";
 
@@ -23,17 +25,21 @@ public class Constants {
     public static void first(){
       UPLOAD = true;
       SIMULATION = true;
+      TEST = true;
       LOG = true;
       SAVE = true;
       RESULT = true;
+      RESET = true;
     }
 
     public static void notFirst(){
       UPLOAD = false;
       SIMULATION = true;
+      TEST = true;
       LOG = true;
-      SAVE = false;
+      SAVE = true;
       RESULT = true;
+      RESET = true;
     }
 
 

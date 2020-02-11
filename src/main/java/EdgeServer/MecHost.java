@@ -29,7 +29,6 @@ public class MecHost {
     private int used;
     private int capacity;
     private HashMap<Integer, Document> collection = new HashMap<>();
-
     private static final ManagementServiceForServer service = new ManagementServiceForServer();
 
     /**
@@ -41,7 +40,7 @@ public class MecHost {
 
     public void initialize(int capacity){
         //set capacity
-        this.capacity = capacity;
+        this.capacity = 0;
         this.used = 0;
         //set location
         initializeLocation();
@@ -61,9 +60,19 @@ public class MecHost {
         this.location.setY(locationY);
     }
 
-    public void updateState(int sizeOfDoc){
+    public void updateState(int sizeOfDoc, boolean added, int weight){
         this.used += sizeOfDoc;
-        this.capacity -= sizeOfDoc;
+        if(added) {
+            this.capacity += weight;
+            service.updateUsed(this);
+        }
+    }
+
+    public void resetState(){
+        this.used = 0;
+        this.capacity = 0;
+        service.updateUsed(this);
+
     }
 
     public int getApplicationId() {

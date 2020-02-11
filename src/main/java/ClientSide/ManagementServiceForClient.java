@@ -73,7 +73,7 @@ public class ManagementServiceForClient {
      * API Call
      * serverに現在位置を反映させる
      *
-     */
+     **/
 
     public void registerLocationToServer(ClientApp client){
 
@@ -112,14 +112,21 @@ public class ManagementServiceForClient {
 
         /*------create call------*/
 
+        RequestBody weight = RequestBody.create(MediaType.parse("multipart/form-data"),
+                String.valueOf(client.getWeight()));
+
 
         Call<ClientModel> call = service.updateHomeOfClient(
                 client.getApplicationId(),
-                client.getClientId());
+                client.getClientId(),
+                weight);
 
         try {
             Response<ClientModel> response = call.execute();
             client.setHomeServerId(response.body().getHome());
+            System.out.println(response.body());
+            System.out.println("Client " + client.getClientId() + " 's Home got");
+        }catch(EOFException e){
         }catch(IOException e){
             e.printStackTrace();
         }
@@ -152,7 +159,6 @@ public class ManagementServiceForClient {
         try {
             Response<ClientModel> response = call.execute();
             client.setHomeServerId(response.body().getHome());
-            System.out.println(response.body());
             System.out.println("Client " + client.getClientId() + " registered");
         }catch(EOFException e){
         }catch(IOException e){
