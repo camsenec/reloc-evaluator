@@ -38,7 +38,7 @@ public class Main {
          **/
 
         /* read command line argument */
-        Constants.notFirst();
+        Constants.first();
 
         FileDownloader.downlaodLogFile(BASE_URL + "simulation/out/tx_log.csv");
         FileFactory.loadLogFile("txLog.csv");
@@ -104,11 +104,14 @@ public class Main {
             }
         }
 
+        int client_count = 0;
         for(int clientId : ManagementServiceForClient.clientMap.keySet()){
             ClientApp client = ManagementServiceForClient.clientMap.get(clientId);
             client.relocate(); //homeserverのidがセットされる
             MecHost server =  ManagementServiceForServer.serverMap.get(client.getHomeServerId());
             server.updateState(0, true, client.getWeight());
+            client_count++;
+            System.out.println(client_count);
         }
 
 
