@@ -11,7 +11,7 @@
 Fig. 1のようなアーキテクチャを考える. C1 ~ C9 はMECサーバーを表しており, ユーザーはある範囲内で自由に動き回りながら, 各サーバーに対してHTTPリクエストをすることができる.    
 
 <div align="center">
-<img src="https://github.com/thanatoth/edge-simulator/blob/doc/doc/arch.png" title = "arch">
+<img src="https://gittk.cs.kobe-u.ac.jp/tomoya/cache-allocation-simulator-on-edge/blob/master/doc/arch.png" title = "arch">
 </div>    
 
 <div align="center">
@@ -26,7 +26,7 @@ Fig. 1 Our System Model of MEC Architecture
 
 
 <div align="center">
-<img src="https://github.com/thanatoth/edge-simulator/blob/doc/doc/arch_sim.png" title="arch_sim">
+<img src="https://gittk.cs.kobe-u.ac.jp/tomoya/cache-allocation-simulator-on-edge/blob/master/doc/arch_sim.png" title="arch_sim">
 </div>
 
 
@@ -35,7 +35,7 @@ Fig. 1 Our System Model of MEC Architecture
 <br><br> 
 
 <div align="center">
-<img src="https://github.com/thanatoth/edge-simulator/blob/doc/doc/near.png" title="near">
+<img src="https://gittk.cs.kobe-u.ac.jp/tomoya/cache-allocation-simulator-on-edge/blob/master/doc/near.png" title="near">
 </div>
 
 
