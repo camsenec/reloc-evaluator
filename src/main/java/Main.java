@@ -80,7 +80,7 @@ public class Main {
                     client.setWeight(1);
                     //give locality
                     double locationX = Math.abs((baseLocation.getX() + random.nextGaussian() * 20) % 100);
-                    double locationY = Math.abs((baseLocation.getX() + random.nextGaussian() * 20) % 100);
+                    double locationY = Math.abs((baseLocation.getY() + random.nextGaussian() * 20) % 100);
                     client.initialize_loc(locationX, locationY);
                     isExist = ManagementServiceForClient.clientMap.putIfAbsent(client.getClientId(), client);
                     if(isExist != null){
