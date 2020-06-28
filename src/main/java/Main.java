@@ -109,7 +109,6 @@ public class Main {
                                 existClient.addWeight(1);
                             }
                         }
-
                     }
                 } else {
                     FileFactory.loadServerState("serverCache.csv", 0);
