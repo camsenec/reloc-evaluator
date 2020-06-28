@@ -72,7 +72,6 @@ public class MecHost {
         this.used = 0;
         this.capacity = 0;
         service.updateUsed(this);
-
     }
 
     public int getApplicationId() {

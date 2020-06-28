@@ -1,3 +1,4 @@
+import ClientSide.ManagementServiceForClient;
 import FileIO.FileDownloader;
 import FileIO.FileFactory;
 
@@ -5,7 +6,7 @@ public class test {
 
     public static void main(String[] args) {
 
-        FileDownloader.downlaodLogFile("http://localhost:8000/simulation/out/txLog.csv");
-        FileFactory.loadLogFile("txLog.csv");
+        ManagementServiceForClient service = new ManagementServiceForClient();
+        service.update_number_of_coopserver(20);
     }
 }

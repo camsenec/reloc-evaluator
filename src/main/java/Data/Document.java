@@ -1,5 +1,7 @@
 package Data;
 
+import Config.Config;
+
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -19,7 +21,7 @@ public class Document {
     }
 
     public void initialize(int docSize){
-        this.size = 100;
+        this.size = Config.sizeOfDocs;
     }
 
     public int getApplicationId() {

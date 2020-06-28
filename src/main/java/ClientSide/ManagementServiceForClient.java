@@ -167,5 +167,24 @@ public class ManagementServiceForClient {
 
     }
 
+    public void update_number_of_coopserver(int number_of_coopserver){
+
+        /*------create request body------*/
+        RequestBody numOfCoopServer = RequestBody.create(MediaType.parse("multipart/form-data"),
+                String.valueOf(number_of_coopserver));
+
+
+        Call<ClientModel> call = service.updateNumOfCoopServer(numOfCoopServer);
+
+        try {
+            Response<ClientModel> response = call.execute();
+        }catch(EOFException e){
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+
+    }
+
+
 
 }

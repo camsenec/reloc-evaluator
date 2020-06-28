@@ -256,6 +256,8 @@ public class FileFactory {
 
             p.printf("%.4f",Metric.MET_1);
             p.print(",");
+            p.printf("%.4f",Result.meanOfUsed);
+            p.print(",");
             p.printf("%.4f",Metric.MET_2);
             p.print(",");
             p.printf("%.4f",Metric.MET_3);

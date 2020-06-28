@@ -50,6 +50,10 @@ public interface EdgeServerAPI {
                                          @Query("client_id") int client_id,
                                          @Part("weight") RequestBody weight);
 
+    @Multipart
+    @PUT("api/v1/manager/area/update_number_of_coopserver/")
+    Call<ClientModel> updateNumOfCoopServer(@Part("number_of_coopserver") RequestBody numOfCluster);
+
 
 
 
