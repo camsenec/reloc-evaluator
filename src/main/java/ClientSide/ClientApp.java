@@ -65,9 +65,8 @@ public class ClientApp {
         double areaLengthX = Constants.MAX_X - Constants.MIN_X;
         double areaLengthY = Constants.MAX_Y - Constants.MIN_Y;
 
-        Random random = new Random();
-        double locationX = Constants.MIN_X + random.nextDouble() * areaLengthX;
-        double locationY = Constants.MIN_Y + random.nextDouble() * areaLengthY;
+        double locationX = Constants.MIN_X + Math.random() * areaLengthX;
+        double locationY = Constants.MIN_Y + Math.random() * areaLengthY;
         this.location.setX(locationX);
         this.location.setY(locationY);
     }
