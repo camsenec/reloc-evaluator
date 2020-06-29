@@ -40,7 +40,7 @@ public class Main {
         ManagementServiceForClient service = new ManagementServiceForClient();
 
         /* read command line argument */
-        for (int t = 1; t <= 2; t++) {
+        for (int t = 1; t <= 100; t++) {
             Result.meanOfUsed = 0;
             Result.minOfUsed = 0;
             Result.maxOfUsed = 0;
@@ -54,10 +54,10 @@ public class Main {
 
             if (t == 1) {
                 Constants.first();
-                service.update_number_of_coopserver(1);
+                service.update_number_of_coopserver(t);
             }else {
                 Constants.notFirst();
-                service.update_number_of_coopserver(10);
+                service.update_number_of_coopserver(t);
             }
 
             FileDownloader.downlaodLogFile(BASE_URL + "simulation/out/tx_log.csv");
@@ -95,13 +95,13 @@ public class Main {
 
                         ArrayList<Integer> clientList = txLog.get(client_id);
                         Point2D baseLocation = client.getLocation();
-                        System.out.println("baselocation" + baseLocation);
+                        //System.out.println("baselocation" + baseLocation);
                         for (int client_id_2 : clientList) {
                             client = new ClientApp(Config.application_id, client_id_2);
                             client.setWeight(1);
                             //give locality
-                            double locationX = Math.abs((baseLocation.getX() + random.nextGaussian() * 20) % Constants.MAX_X);
-                            double locationY = Math.abs((baseLocation.getX() + random.nextGaussian() * 20) % Constants.MAX_Y);
+                            double locationX = Math.abs((baseLocation.getX() + random.nextGaussian() * 100) % Constants.MAX_X);
+                            double locationY = Math.abs((baseLocation.getX() + random.nextGaussian() * 100) % Constants.MAX_Y);
                             client.initialize_loc(locationX, locationY);
                             isExist = ManagementServiceForClient.clientMap.putIfAbsent(client.getClientId(), client);
                             if (isExist != null) {

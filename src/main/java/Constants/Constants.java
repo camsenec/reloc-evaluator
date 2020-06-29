@@ -17,8 +17,8 @@ public class Constants {
 
     public static final double MIN_Y = 0;
     public static final double MIN_X = 0;
-    public static final double MAX_X = 20;
-    public static final double MAX_Y = 20;
+    public static final double MAX_X = 100;
+    public static final double MAX_Y = 100;
 
     public static final int INF = 10000000;
 
