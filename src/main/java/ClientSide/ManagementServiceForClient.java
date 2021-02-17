@@ -71,8 +71,7 @@ public class ManagementServiceForClient {
 
     /**
      * API Call
-     * serverに現在位置を反映させる
-     *
+     * register location to management server
      **/
 
     public void registerLocationToServer(ClientApp client){
@@ -103,8 +102,8 @@ public class ManagementServiceForClient {
 
     /**
      * API Call
-     * serverに現在位置を反映させる
-     * @param client APIを呼び出すクライアントのインスタンス
+     * get home server id
+     * @param client instance of client
      *
      */
 
@@ -179,6 +178,7 @@ public class ManagementServiceForClient {
         try {
             Response<ClientModel> response = call.execute();
         }catch(EOFException e){
+            e.printStackTrace();
         }catch(IOException e){
             e.printStackTrace();
         }

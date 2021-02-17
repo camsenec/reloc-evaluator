@@ -1,3 +1,4 @@
+/*
 package Retrofit;
 
 import okhttp3.OkHttpClient;
@@ -25,3 +26,4 @@ public class Service {
     public final EdgeServerAPI service = retro.create(EdgeServerAPI.class);
 
 }
+*/
