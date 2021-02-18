@@ -28,72 +28,43 @@ public class Main {
 
         /* read command line argument */
         for (int t = 1; t <= 100; t++) {
-            Result.meanOfUsed = 0;
-            Result.minOfUsed = 0;
-            Result.maxOfUsed = 0;
-            Result.rateOfSaved = 0;
-            Result.meanOfCachedDocs = 0;
-            Result.kindOfDocument = 0;
-            Result.numberOfCachedDocument = 0;
-            Result.numberOfSender = 0;
-            Result.numberOfClient = 0;
-            Result.saved = 0;
-
+            Result.reset();
             if (t == 1) Constants.first();
             else Constants.notFirst();
-            service.update_number_of_coopserver(t);
+            service.updateNumberOfCoopServer(t);
 
             FileFactory.loadLogFile("txLog.csv");
 
-            /*
-                1. インスタンスの作成
-                2. 初期化
-                3. シミュレーション用のコレクションに追加
-            */
-
             if (Constants.UPLOAD) {
-                /* 1 : Register server for a management server*/
+                /* Step 1 : Register server to a management server */
                 for (int i = 0; i < Config.numberOfServers; i++) {
                     MecHost host = new MecHost(Config.application_id);
-                    host.initialize(0); //why is it 0?
+                    host.initialize(Config.capacityOfServers); //why is it 0?
                     ManagementServiceForServer.serverMap.put(host.getServerId(), host);
                 }
 
 
-                /* 手順2 : クライアントの管理サーバーへの登録(同期実行)*/
+                /* Step 2 : Register client to a management server*/
                 ClientApp client;
-                ClientApp isExist;
                 Random random = new Random();
 
                 for (Integer sender_id : txLog.keySet()) {
                     client = new ClientApp(Config.application_id, sender_id);
                     client.initialize();
-                    //client.setWeight(1);
-                    isExist = ManagementServiceForClient.clientMap.putIfAbsent(client.getClientId(), client);
-                    if (isExist != null) {
-                        ClientApp existClient = ManagementServiceForClient.clientMap.get(client.getClientId());
-                        //existClient.addWeight(1);
-                    }
+                    ManagementServiceForClient.clientMap.putIfAbsent(client.getClientId(), client);
 
                     ArrayList<Integer> receivers = txLog.get(sender_id);
                     Point2D baseLocation = client.getLocation();
                     //System.out.println("baselocation" + baseLocation);
                     for (int receiver : receivers) {
                         client = new ClientApp(Config.application_id, receiver);
-                        //client.setWeight(1);
-                        //give locality (should be modified)
                         double locationX = Math.abs((baseLocation.getX() + random.nextGaussian() * 100) % Constants.MAX_X);
                         double locationY = Math.abs((baseLocation.getX() + random.nextGaussian() * 100) % Constants.MAX_Y);
                         client.initializeLocation(locationX, locationY);
-                        isExist = ManagementServiceForClient.clientMap.putIfAbsent(client.getClientId(), client);
-                        if (isExist != null) {
-                            ClientApp existClient = ManagementServiceForClient.clientMap.get(client.getClientId());
-                            //existClient.addWeight(1);
-                        }
                     }
                 }
             } else {
-                FileFactory.loadServerState("serverCache.csv", 0); //Why is it
+                FileFactory.loadServerState("serverCache.csv", Config.capacityOfServers); //Why is it
                 FileFactory.loadClientState("clientCache.csv");
             }
 
@@ -103,20 +74,15 @@ public class Main {
                 server.resetState();
             }
 
-            int client_count = 0;
             for (int clientId : ManagementServiceForClient.clientMap.keySet()) {
                 ClientApp client = ManagementServiceForClient.clientMap.get(clientId);
-                client.assignHomeserver(); //homeserverのidがセットされる
-                MecHost server = ManagementServiceForServer.serverMap.get(client.getHomeServerId());
-                //server.updateState(0, true, client.getWeight());
-                client_count++;
-                System.out.println(client_count);
+                client.assignHomeserver();
             }
 
 
 
 
-            /*手順3 : ドキュメントの準備（ローカル）*/
+            /*Step 3 : Prepare Document */
             int document_id = 1;
             for (Integer sender_id : txLog.keySet()) {
                 ArrayList<Integer> docList = new ArrayList<>();
@@ -144,14 +110,14 @@ public class Main {
 
                         //If a new document is published, update the server state
                         if (isExist == null) {
-                            server.updateState(document.getSize(), false, 0);
+                            server.addUsed(document.getSize());
                         } else {
                             Result.saved++;
                             System.out.format("Document %d has already been stored!", documentId);
                         }
 
                         for (int receiverId : receivers) {
-                            /* 送り先クライアントの home serverを取得*/
+                            /* get home server of a receiver*/
                             homeId = ManagementServiceForClient.clientMap.get(receiverId).getHomeServerId();
                             server = ManagementServiceForServer.serverMap.get(homeId);
                             isExist = server.getCollection().putIfAbsent(document.getDocumentId(), document);
@@ -159,7 +125,7 @@ public class Main {
 
                             //If a new document is published, update the server state
                             if (isExist == null) {
-                                server.updateState(document.getSize(), false, 0);
+                                server.addUsed(document.getSize());
                             } else {
                                 Result.saved++;
                                 System.out.format("Document %d has already been stored!", documentId);
@@ -170,7 +136,6 @@ public class Main {
             }
 
             if (Constants.TEST) {
-                //serverごとのクライアント集合, C_l の生成
                 HashMap<Integer, ArrayList<Integer>> homeClientMap = new HashMap<>();
                 for (Integer serverId : ManagementServiceForServer.serverMap.keySet()) {
                     homeClientMap.put(serverId, new ArrayList<>());
@@ -327,13 +292,6 @@ public class Main {
                     System.out.println(server);
                 }
             }
-
-
-            for (Integer clientId : ManagementServiceForClient.clientMap.keySet()) {
-                ClientApp client = ManagementServiceForClient.clientMap.get(clientId);
-                System.out.println("clientId" + clientId + "weight" + client.getWeight());
-            }
-
 
             if (Constants.RESULT) {
                 int sumOfUsed = 0;
