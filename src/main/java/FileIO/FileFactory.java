@@ -103,12 +103,10 @@ public class FileFactory {
                 double x = Double.parseDouble(data[2]);
                 double y = Double.parseDouble(data[3]);
                 int home = Integer.parseInt(data[4]);
-                int weight = Integer.parseInt(data[5]);
                 Point2D location = new Point2D(x,y);
                 ClientApp client = new ClientApp(application_id, client_id);
                 client.setLocation(location);
                 client.setHomeServerId(home);
-                client.setWeight(weight);
                 ManagementServiceForClient.clientMap.put(client.getClientId(), client);
                 count++;
             }
@@ -120,24 +118,11 @@ public class FileFactory {
         }
     }
 
-    /**
-     * write to local file
-     */
-
     public static void saveServerState(){
         try {
-
-            // 出力ファイルの作成
             FileWriter f = new FileWriter("./Cache/serverCache.csv", false);
             PrintWriter p = new PrintWriter(new BufferedWriter(f));
 
-            /*
-            ・application_id
-            ・server_id
-            ・X
-            ・Y
-
-             */
             for(int serverId : ManagementServiceForServer.serverMap.keySet()){
                 MecHost server = ManagementServiceForServer.serverMap.get(serverId);
                 p.print(server.getApplicationId());
@@ -165,14 +150,6 @@ public class FileFactory {
             // 出力ファイルの作成
             FileWriter f = new FileWriter("./Cache/clientCache.csv", false);
             PrintWriter p = new PrintWriter(new BufferedWriter(f));
-
-            /*
-            ・application_id
-            ・server_id
-            ・X
-            ・Y
-
-             */
             for(int clientId : ManagementServiceForClient.clientMap.keySet()){
                 ClientApp client = ManagementServiceForClient.clientMap.get(clientId);
                 p.print(client.getApplicationId());
@@ -184,9 +161,6 @@ public class FileFactory {
                 p.print(client.getLocation().getY());
                 p.print(",");
                 p.print(client.getHomeServerId());
-                p.print(",");
-                p.print(client.getWeight());
-
                 p.println();
             }
             p.close();
@@ -201,22 +175,8 @@ public class FileFactory {
 
     public static void saveResult(){
         try {
-            // 出力ファイルの作成
             FileWriter f = new FileWriter("./Result/result.csv", true);
             PrintWriter p = new PrintWriter(new BufferedWriter(f));
-
-            /*
-            public static double meanOfUsed = 0;
-            public static double minOfUsed = 0;
-            public static double maxOfUsed = 0;
-            public static double rateOfSaved = 0;
-
-            public static int kindOfDocument = 0;
-            public static int numberOfCachedDocument = 0;
-            public static int numberOfSender = 0;
-            public static int numberOfClient = 0;
-            public static int saved = 0;
-             */
 
             p.print(Result.numberOfSender);
             p.print(",");
@@ -250,8 +210,7 @@ public class FileFactory {
 
     public static void saveMetric(){
         try {
-            // 出力ファイルの作成
-            FileWriter f = new FileWriter("./Result/result_2.csv", true);
+            FileWriter f = new FileWriter("./Result/metrics.csv", true);
             PrintWriter p = new PrintWriter(new BufferedWriter(f));
 
             p.printf("%.4f",Metric.MET_1);

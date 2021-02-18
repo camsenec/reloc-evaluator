@@ -6,7 +6,6 @@ import EdgeServer.ManagementServiceForServer;
 import EdgeServer.MecHost;
 import Constants.Constants;
 import Field.Point2D;
-import FileIO.FileDownloader;
 import FileIO.FileFactory;
 
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ import Result.Result;
 import Config.Config;
 import Result.Metric;
 
-import static Constants.Constants.BASE_URL;
 import static Logger.TxLog.txLog;
 import static Logger.TxLog.txLogDocs;
 
@@ -30,72 +28,49 @@ public class Main {
 
         /* read command line argument */
         for (int t = 1; t <= 100; t++) {
-            Result.meanOfUsed = 0;
-            Result.minOfUsed = 0;
-            Result.maxOfUsed = 0;
-            Result.rateOfSaved = 0;
-            Result.meanOfCachedDocs = 0;
-            Result.kindOfDocument = 0;
-            Result.numberOfCachedDocument = 0;
-            Result.numberOfSender = 0;
-            Result.numberOfClient = 0;
-            Result.saved = 0;
-
+            Result.reset();
             if (t == 1) Constants.first();
             else Constants.notFirst();
-            service.update_number_of_coopserver(t);
+            service.updateNumberOfCoopServer(t);
 
             FileFactory.loadLogFile("txLog.csv");
 
-            /*
-                1. インスタンスの作成
-                2. 初期化
-                3. シミュレーション用のコレクションに追加
-            */
-
             if (Constants.UPLOAD) {
-                /* 1 : Register server for a management server*/
+                /* Step 1 : Register server to a management server */
                 for (int i = 0; i < Config.numberOfServers; i++) {
                     MecHost host = new MecHost(Config.application_id);
-                    host.initialize(0); //why is it 0?
+                    host.initialize(Config.capacityOfServers); //why is it 0?
                     ManagementServiceForServer.serverMap.put(host.getServerId(), host);
                 }
 
 
-                /* 手順2 : クライアントの管理サーバーへの登録(同期実行)*/
+                /* Step 2 : Register client to a management server*/
                 ClientApp client;
-                ClientApp isExist;
                 Random random = new Random();
 
                 for (Integer sender_id : txLog.keySet()) {
                     client = new ClientApp(Config.application_id, sender_id);
-                    client.initialize();
-                    //client.setWeight(1);
-                    isExist = ManagementServiceForClient.clientMap.putIfAbsent(client.getClientId(), client);
-                    if (isExist != null) {
-                        ClientApp existClient = ManagementServiceForClient.clientMap.get(client.getClientId());
-                        //existClient.addWeight(1);
-                    }
+                    ManagementServiceForClient.clientMap.putIfAbsent(client.getClientId(), client);
 
                     ArrayList<Integer> receivers = txLog.get(sender_id);
                     Point2D baseLocation = client.getLocation();
-                    //System.out.println("baselocation" + baseLocation);
                     for (int receiver : receivers) {
                         client = new ClientApp(Config.application_id, receiver);
-                        //client.setWeight(1);
-                        //give locality (should be modified)
-                        double locationX = Math.abs((baseLocation.getX() + random.nextGaussian() * 100) % Constants.MAX_X);
-                        double locationY = Math.abs((baseLocation.getX() + random.nextGaussian() * 100) % Constants.MAX_Y);
-                        client.initializeLocation(locationX, locationY);
-                        isExist = ManagementServiceForClient.clientMap.putIfAbsent(client.getClientId(), client);
-                        if (isExist != null) {
-                            ClientApp existClient = ManagementServiceForClient.clientMap.get(client.getClientId());
-                            //existClient.addWeight(1);
+                        double locationX, locationY;
+                        while(true){
+                            locationX = baseLocation.getX() + random.nextGaussian() * Config.locality;
+                            if(locationX >= 0 && locationX <= Constants.MAX_X) break;
                         }
+                        while(true){
+                            locationY = baseLocation.getY() + random.nextGaussian() * Config.locality;
+                            if(locationY >= 0 && locationY <= Constants.MAX_Y) break;
+                        }
+                        client.initialize(locationX, locationY);
                     }
                 }
+
             } else {
-                FileFactory.loadServerState("serverCache.csv", 0); //Why is it
+                FileFactory.loadServerState("serverCache.csv", Config.capacityOfServers); //Why is it
                 FileFactory.loadClientState("clientCache.csv");
             }
 
@@ -105,20 +80,14 @@ public class Main {
                 server.resetState();
             }
 
-            int client_count = 0;
             for (int clientId : ManagementServiceForClient.clientMap.keySet()) {
                 ClientApp client = ManagementServiceForClient.clientMap.get(clientId);
-                client.assignHomeserver(); //homeserverのidがセットされる
-                MecHost server = ManagementServiceForServer.serverMap.get(client.getHomeServerId());
-                //server.updateState(0, true, client.getWeight());
-                client_count++;
-                System.out.println(client_count);
+                client.assignHomeserver();
+                ManagementServiceForServer.serverMap.get(client.getHomeServerId()).addConnection();
             }
 
 
-
-
-            /*手順3 : ドキュメントの準備（ローカル）*/
+            /*Step 3 : Prepare Document */
             int document_id = 1;
             for (Integer sender_id : txLog.keySet()) {
                 ArrayList<Integer> docList = new ArrayList<>();
@@ -146,14 +115,14 @@ public class Main {
 
                         //If a new document is published, update the server state
                         if (isExist == null) {
-                            server.updateState(document.getSize(), false, 0);
+                            server.addUsed(document.getSize());
                         } else {
                             Result.saved++;
                             System.out.format("Document %d has already been stored!", documentId);
                         }
 
                         for (int receiverId : receivers) {
-                            /* 送り先クライアントの home serverを取得*/
+                            /* get home server of a receiver*/
                             homeId = ManagementServiceForClient.clientMap.get(receiverId).getHomeServerId();
                             server = ManagementServiceForServer.serverMap.get(homeId);
                             isExist = server.getCollection().putIfAbsent(document.getDocumentId(), document);
@@ -161,7 +130,7 @@ public class Main {
 
                             //If a new document is published, update the server state
                             if (isExist == null) {
-                                server.updateState(document.getSize(), false, 0);
+                                server.addUsed(document.getSize());
                             } else {
                                 Result.saved++;
                                 System.out.format("Document %d has already been stored!", documentId);
@@ -171,32 +140,18 @@ public class Main {
                 }
             }
 
-        /*
-        for(Integer clientId: ManagementServiceForClient.clientMap.keySet()){
-            rxLogDocs.put(clientId, new ArrayList<Integer>());
-        }
+            if (Constants.TEST) {
+                HashMap<Integer, ArrayList<Integer>> homeClientMap = new HashMap<>();
+                for (Integer serverId : ManagementServiceForServer.serverMap.keySet()) {
+                    homeClientMap.put(serverId, new ArrayList<>());
+                }
 
-        for(Integer sendFromId : txLogDocs.keySet()){
-            ArrayList<Integer> sendToList = txLogDocs.get(sendFromId);
-            for(Integer sendToId: sendToList){
-                rxLogDocs.get(sendToId).add(sendFromId);
-            }
-        }
-        */
-
-                if (Constants.TEST) {
-                    //serverごとのクライアント集合, C_l の生成
-                    HashMap<Integer, ArrayList<Integer>> homeClientMap = new HashMap<>();
-                    for (Integer serverId : ManagementServiceForServer.serverMap.keySet()) {
-                        homeClientMap.put(serverId, new ArrayList<>());
-                    }
-
-                    for (Integer clientId : txLog.keySet()) {
-                        ClientApp client = ManagementServiceForClient.clientMap.get(clientId);
-                        Integer homeId = client.getHomeServerId();
-                        homeClientMap.get(homeId).add(clientId);
-                    }
-
+                for (Integer sender : txLog.keySet()) {
+                    int homeId = ManagementServiceForClient.clientMap.get(sender).getHomeServerId();
+                    homeClientMap.get(homeId).add(sender);
+                }
+                
+                if(Constants.DEBUG){
                     for (Integer a : homeClientMap.keySet()) {
                         System.out.print(a + " : ");
                         ArrayList<Integer> b = homeClientMap.get(a);
@@ -204,178 +159,152 @@ public class Main {
                             System.out.print(id + " ");
                         }
                     }
-
-                    //1. Y_1
-                    int pubSizeSum;
-                    HashMap<Integer, Double> rMap = new HashMap<>();
-                    for (Integer serverId : homeClientMap.keySet()) {
-                        ArrayList<Integer> C_l = homeClientMap.get(serverId);
-                        MecHost s_l = ManagementServiceForServer.serverMap.get(serverId);
-                        pubSizeSum = 0;
-                        for (Integer clientId : C_l) {
-                            ArrayList<Integer> publishDocs = txLogDocs.get(clientId); //pubDocsは排他的
-                            if (publishDocs != null) {
-                                pubSizeSum += publishDocs.size();
-                            }
-                        }
-                        if (Config.capacityOfServers >= s_l.getUsed()) {
-                            rMap.put(serverId, 0.0);
-                        } else {
-                            rMap.put(serverId, 1 - (Config.capacityOfServers / (double) s_l.getUsed()));
-                        }
-                    }
-
-                    double sum = 0;
-                    for (Integer serverId : rMap.keySet()) {
-                        sum += rMap.get(serverId);
-                    }
-                    Metric.MET_1 = sum / Config.numberOfServers;
-
-                    for (double r : rMap.values()) {
-                        System.out.println(r);
-                    }
-
-
-                    //2.Y_2
-                    HashMap<Integer, Integer> connectionNumMap = new HashMap<>();
-                    for (Integer serverId : homeClientMap.keySet()) {
-                        ArrayList<Integer> C_l = homeClientMap.get(serverId);
-                        connectionNumMap.put(serverId, C_l.size());
-                    }
-
-                    sum = 0;
-                    for (Integer serverId : connectionNumMap.keySet()) {
-                        sum += connectionNumMap.get(serverId);
-                    }
-                    double ave = sum / Config.numberOfServers;
-
-                    sum = 0;
-                    for (Integer serverId : connectionNumMap.keySet()) {
-                        sum += (connectionNumMap.get(serverId) - ave) * (connectionNumMap.get(serverId) - ave);
-                    }
-                    Metric.MET_2 = Math.sqrt((double) sum / (Config.numberOfServers - 1));
-
-                    //3.Y_3
-                    HashMap<Integer, Double> distanceMap = new HashMap<>();
-                    double distSum;
-                    int count_tmp = 0;
-                    for (Integer serverId : homeClientMap.keySet()) {
-                        ArrayList<Integer> C_l = homeClientMap.get(serverId);
-                        MecHost s_l = ManagementServiceForServer.serverMap.get(serverId);
-                        distSum = 0;
-                        for (Integer clientId : C_l) {
-                            ClientApp c_m = ManagementServiceForClient.clientMap.get(clientId);
-                            double x_dist = Math.abs(c_m.getLocation().getX() - s_l.getLocation().getX());
-                            double y_dist = Math.abs(c_m.getLocation().getY() - s_l.getLocation().getY());
-                            double dist = Math.sqrt(x_dist * x_dist + y_dist * y_dist);
-                            distSum += dist;
-                            count_tmp++;
-                        }
-                        distanceMap.put(serverId, distSum);
-                    }
-                    System.out.println("count" + count_tmp);
-                    System.out.println("size" + ManagementServiceForClient.clientMap.size());
-
-                    sum = 0;
-                    for (Integer serverId : distanceMap.keySet()) {
-                        sum += distanceMap.get(serverId);
-                    }
-                    Metric.MET_3 = sum / txLog.size();
-
-                    for (Integer serverId : connectionNumMap.keySet()) {
-                        System.out.println(connectionNumMap.get(serverId));
-                    }
-
-
-                    //4.Y
-                    //4.1 Constants
-                    int A = Config.capacityOfServers;
-                    int B = 100;
-                    int t_mn = 5;
-                    int L = Config.numberOfServers;
-                    int M = txLog.size();
-                    int N = 3;
-                    double alpha = 5;
-                    double beta = 1;
-                    double gamma = 0.1;
-                    double y_0, y_1, y_2, y_3;
-                    double y;
-                    y_1 = y_2 = y_3 = 0;
-
-                    y_0 = t_mn * N * M;
-
-                    for (int serverId : ManagementServiceForServer.serverMap.keySet()) {
-                        y_1 += rMap.get(serverId) * connectionNumMap.get(serverId);
-                    }
-                    y_1 = y_1 * alpha * N * t_mn;
-
-                    for (int serverId : ManagementServiceForServer.serverMap.keySet()) {
-                        int connectionNum = connectionNumMap.get(serverId);
-                        if (connectionNum > B) {
-                            y_2 += connectionNum * (connectionNum - B);
-                        } else {
-                            y_2 += 0;
-                        }
-                    }
-                    y_2 = y_2 * beta * N;
-
-                    for (int serverId : ManagementServiceForServer.serverMap.keySet()) {
-                        y_3 += distanceMap.get(serverId);
-                    }
-                    y_3 = y_3 * gamma * N;
-
-                    y = y_0 + y_1 + y_2 + y_3;
-                    Metric.MET_4 = y;
-
-                    System.out.println(y_0 + " " + y_1 + " " + y_2 + " " + y_3);
                 }
 
-
-                if (Constants.SAVE) {
-                    FileFactory.saveServerState();
-                    FileFactory.saveClientState();
-                }
-
-                if (Constants.LOG) {
-                    for (int serverId : ManagementServiceForServer.serverMap.keySet()) {
-                        MecHost server = ManagementServiceForServer.serverMap.get(serverId);
-                        System.out.println(server);
+                //1. Y_1
+                HashMap<Integer, Double> rMap = new HashMap<>();
+                for (Integer serverId : homeClientMap.keySet()) {
+                    MecHost s_l = ManagementServiceForServer.serverMap.get(serverId);
+                    if (Config.capacityOfServers >= s_l.getUsed()) {
+                        rMap.put(serverId, 0.0);
+                    } else {
+                        rMap.put(serverId, 1 - (Config.capacityOfServers / (double) s_l.getUsed()));
                     }
                 }
 
-
-                for (Integer clientId : ManagementServiceForClient.clientMap.keySet()) {
-                    ClientApp client = ManagementServiceForClient.clientMap.get(clientId);
-                    System.out.println("clientId" + clientId + "weight" + client.getWeight());
+                double sum = 0;
+                for (double r : rMap.values()) {
+                    sum += r;
                 }
+                Metric.MET_1 = sum / Config.numberOfServers;
 
+                //2. Y_2
+                sum = 0;
+                for (MecHost server : ManagementServiceForServer.serverMap.values()) {
+                    sum += server.getConnection();
+                }
+                double ave = sum / Config.numberOfServers;
 
-                if (Constants.RESULT) {
-                    int sumOfUsed = 0;
-                    Result.minOfUsed = Constants.INF;
-                    Result.maxOfUsed = Constants.INF * (-1);
-                    Result.numberOfClient = ManagementServiceForClient.clientMap.size();
+                sum = 0;
+                for (MecHost server : ManagementServiceForServer.serverMap.values()) {
+                    sum += (server.getConnection() - ave) * (server.getConnection() - ave);
+                }
+                Metric.MET_2 = Math.sqrt((double) sum / (Config.numberOfServers - 1));
 
-                    for (int serverId : ManagementServiceForServer.serverMap.keySet()) {
-                        MecHost server = ManagementServiceForServer.serverMap.get(serverId);
-                        sumOfUsed += server.getUsed();
-
-                        if (server.getUsed() > Result.maxOfUsed) {
-                            Result.maxOfUsed = server.getUsed();
-                        }
-                        if (server.getUsed() < Result.minOfUsed) {
-                            Result.minOfUsed = server.getUsed();
-                        }
+                //3.Y_3
+                HashMap<Integer, Double> distanceMap = new HashMap<>();
+                double distSum;
+                int count_tmp = 0;
+                for (Integer serverId : homeClientMap.keySet()) {
+                    ArrayList<Integer> C_l = homeClientMap.get(serverId);
+                    MecHost s_l = ManagementServiceForServer.serverMap.get(serverId);
+                    distSum = 0;
+                    for (Integer clientId : C_l) {
+                        ClientApp c_m = ManagementServiceForClient.clientMap.get(clientId);
+                        double x_dist = Math.abs(c_m.getLocation().getX() - s_l.getLocation().getX());
+                        double y_dist = Math.abs(c_m.getLocation().getY() - s_l.getLocation().getY());
+                        double dist = Math.sqrt(x_dist * x_dist + y_dist * y_dist);
+                        distSum += dist;
+                        count_tmp++;
                     }
-                    Result.meanOfUsed = (double) sumOfUsed / (double) ManagementServiceForServer.serverMap.size();
-                    Result.numberOfSender = txLog.size();
-                    Result.kindOfDocument = Result.numberOfSender * Config.numberOfDocsPerClients;
-                    Result.rateOfSaved = (double) Result.saved / (double) Result.numberOfCachedDocument;
-                    Result.meanOfCachedDocs = Result.meanOfUsed / Config.sizeOfDocs;
-
-                    FileFactory.saveResult();
-                    FileFactory.saveMetric();
+                    distanceMap.put(serverId, distSum);
                 }
+                System.out.println("count" + count_tmp);
+                System.out.println("size" + ManagementServiceForClient.clientMap.size());
+
+                sum = 0;
+                for (Integer serverId : distanceMap.keySet()) {
+                    sum += distanceMap.get(serverId);
+                }
+                Metric.MET_3 = sum / txLog.size();
+
+                for (Integer serverId : connectionNumMap.keySet()) {
+                    System.out.println(connectionNumMap.get(serverId));
+                }
+
+
+                //4.Y
+                //4.1 Constants
+                int A = Config.capacityOfServers;
+                int B = 100;
+                int t_mn = 5;
+                int L = Config.numberOfServers;
+                int M = txLog.size();
+                int N = 3;
+                double alpha = 5;
+                double beta = 1;
+                double gamma = 0.1;
+                double y_0, y_1, y_2, y_3;
+                double y;
+                y_1 = y_2 = y_3 = 0;
+
+                y_0 = t_mn * N * M;
+
+                for (int serverId : ManagementServiceForServer.serverMap.keySet()) {
+                    y_1 += rMap.get(serverId) * connectionNumMap.get(serverId);
+                }
+                y_1 = y_1 * alpha * N * t_mn;
+
+                for (int serverId : ManagementServiceForServer.serverMap.keySet()) {
+                    int connectionNum = connectionNumMap.get(serverId);
+                    if (connectionNum > B) {
+                        y_2 += connectionNum * (connectionNum - B);
+                    } else {
+                        y_2 += 0;
+                    }
+                }
+                y_2 = y_2 * beta * N;
+
+                for (int serverId : ManagementServiceForServer.serverMap.keySet()) {
+                    y_3 += distanceMap.get(serverId);
+                }
+                y_3 = y_3 * gamma * N;
+
+                y = y_0 + y_1 + y_2 + y_3;
+                Metric.MET_4 = y;
+
+                System.out.println(y_0 + " " + y_1 + " " + y_2 + " " + y_3);
+            }
+
+
+            if (Constants.SAVE) {
+                FileFactory.saveServerState();
+                FileFactory.saveClientState();
+            }
+
+            if (Constants.LOG) {
+                for (int serverId : ManagementServiceForServer.serverMap.keySet()) {
+                    MecHost server = ManagementServiceForServer.serverMap.get(serverId);
+                    System.out.println(server);
+                }
+            }
+
+            if (Constants.RESULT) {
+                int sumOfUsed = 0;
+                Result.minOfUsed = Constants.INF;
+                Result.maxOfUsed = Constants.INF * (-1);
+                Result.numberOfClient = ManagementServiceForClient.clientMap.size();
+
+                for (int serverId : ManagementServiceForServer.serverMap.keySet()) {
+                    MecHost server = ManagementServiceForServer.serverMap.get(serverId);
+                    sumOfUsed += server.getUsed();
+
+                    if (server.getUsed() > Result.maxOfUsed) {
+                        Result.maxOfUsed = server.getUsed();
+                    }
+                    if (server.getUsed() < Result.minOfUsed) {
+                        Result.minOfUsed = server.getUsed();
+                    }
+                }
+                Result.meanOfUsed = (double) sumOfUsed / (double) ManagementServiceForServer.serverMap.size();
+                Result.numberOfSender = txLog.size();
+                Result.kindOfDocument = Result.numberOfSender * Config.numberOfDocsPerClients;
+                Result.rateOfSaved = (double) Result.saved / (double) Result.numberOfCachedDocument;
+                Result.meanOfCachedDocs = Result.meanOfUsed / Config.sizeOfDocs;
+
+                FileFactory.saveResult();
+                FileFactory.saveMetric();
             }
         }
     }
+}

@@ -13,4 +13,17 @@ public class Result {
     public static int numberOfSender = 0;
     public static int numberOfClient = 0;
     public static int saved = 0;
+
+    public static void reset(){
+        meanOfUsed = 0;
+        minOfUsed = 0;
+        maxOfUsed = 0;
+        rateOfSaved = 0;
+        meanOfCachedDocs = 0;
+        kindOfDocument = 0;
+        numberOfCachedDocument = 0;
+        numberOfSender = 0;
+        numberOfClient = 0;
+        saved = 0;
+    }
 }

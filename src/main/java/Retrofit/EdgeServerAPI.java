@@ -47,8 +47,7 @@ public interface EdgeServerAPI {
     @Multipart
     @PUT("api/v1/manager/user/update_home/")
     Call<ClientModel> updateHomeOfClient(@Query("application_id") int application_id,
-                                         @Query("client_id") int client_id,
-                                         @Part("weight") RequestBody weight);
+                                         @Query("client_id") int client_id);
 
     @Multipart
     @PUT("api/v1/manager/area/update_number_of_coopserver/")

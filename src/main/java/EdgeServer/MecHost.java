@@ -8,19 +8,6 @@ import Field.Point2D;
 import java.util.HashMap;
 import java.util.Random;
 
-/*
-    サーバー上で動くサーバプログラムを想定
-    サーバープログラムに組み込まなければならないものは,
-    残り容量（もしくは差分）を取得することと,
-    Managementサーバーに送信すること
-    これは, ディベロッパーに任せる
-
-    残り容量の取得は基本的にどのプログラミング言語でも可能であろうし,
-    Managementサーバーに送信することも容易
-
-    'サーバーレス'とかであれば, そのプラットフォームの提供者が組み込むことを想定
-    なんにしろ, サーバーマシンの保有者が利用することを想定
- */
 
 public class MecHost {
     private int applicationId;
@@ -28,6 +15,7 @@ public class MecHost {
     private Point2D location = new Point2D();
     private int used;
     private int capacity;
+    private int connection;
     private HashMap<Integer, Document> collection = new HashMap<>();
     private static final ManagementServiceForServer service = new ManagementServiceForServer();
 
@@ -39,12 +27,10 @@ public class MecHost {
     }
 
     public void initialize(int capacity){
-        //set capacity
-        this.capacity = 0;
+        this.capacity = capacity;
         this.used = 0;
-        //set location
+        this.connection = 0;
         initializeLocation();
-        //set serverId
         service.registerToServer(this);
 
     }
@@ -60,18 +46,20 @@ public class MecHost {
         this.location.setY(locationY);
     }
 
-    public void updateState(int sizeOfDoc, boolean added, int weight){
+    public void addUsed(int sizeOfDoc){
         this.used += sizeOfDoc;
-        if(added) {
-            this.capacity += weight;
-            service.updateUsed(this);
-        }
+        service.updateState(this);
+    }
+
+    public void addConnection(){
+        this.connection++;
+        service.updateState(this);
     }
 
     public void resetState(){
         this.used = 0;
         this.capacity = 0;
-        service.updateUsed(this);
+        service.updateState(this);
     }
 
     public int getApplicationId() {
@@ -114,6 +102,16 @@ public class MecHost {
         this.capacity = capacity;
     }
 
+     public int getConnection() {
+        return connection;
+    }
+
+    public void setConnection(int connection) {
+        this.connection = connection;
+    }
+
+    
+
     public HashMap<Integer, Document> getCollection() {
         return collection;
     }
@@ -129,4 +127,5 @@ public class MecHost {
                 ", collection=" + collection +
                 '}';
     }
+
 }
