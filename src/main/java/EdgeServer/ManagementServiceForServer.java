@@ -1,8 +1,6 @@
 package EdgeServer;
 
-import ClientSide.ClientApp;
 import Data.Document;
-import Model.ClientModel;
 import Model.EdgeServerModel;
 import Retrofit.EdgeServerAPI;
 import okhttp3.MediaType;
@@ -13,7 +11,6 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
@@ -21,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 import static Constants.Constants.BASE_URL;
 
 public class ManagementServiceForServer {
-    //<application_id -> document_idで指定*/
     public static final HashMap<Integer, Document> collection = new HashMap<>();
     public static final HashMap<Integer, MecHost> serverMap = new HashMap<>();
 
@@ -65,16 +61,15 @@ public class ManagementServiceForServer {
 
         try {
             Response<EdgeServerModel> response = call.execute();
-            System.out.println(response.body());
             host.setServerId(response.body().getServer_id());
-            System.out.println("Server " + host.getServerId() + " registered");
+            System.out.println("Server " + host.getServerId() + " was registered");
         }catch(IOException e){
             e.printStackTrace();
         }
 
     }
 
-    public void updateUsed(MecHost server){
+    public void updateState(MecHost server){
 
         RequestBody capacity = RequestBody.create(MediaType.parse("multipart/form-data"),
                 String.valueOf(server.getCapacity()));

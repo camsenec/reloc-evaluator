@@ -37,106 +37,12 @@ public class ManagementServiceForClient {
     private final EdgeServerAPI service = retro.create(EdgeServerAPI.class);
 
 
+   
     /**
      * API Call
      * @param client クライアントのインスタンス
      */
     public void registerToServer(ClientApp client){
-
-        /*------create request body------*/
-
-        RequestBody x = RequestBody.create(MediaType.parse("multipart/form-data"),
-                String.valueOf(client.getLocation().getX()));
-
-        RequestBody y = RequestBody.create(MediaType.parse("multipart/form-data"),
-                String.valueOf(client.getLocation().getY()));
-
-
-        Call<ClientModel> call = service.postClient(
-                client.getApplicationId(),
-                x,
-                y);
-
-        try {
-            Response<ClientModel> response = call.execute();
-            System.out.println(response);
-            client.setClientId(response.body().getClientId());
-        }catch(IOException e){
-            e.printStackTrace();
-        }
-
-
-
-    }
-
-    /**
-     * API Call
-     * register location to management server
-     **/
-
-    public void registerLocationToServer(ClientApp client){
-
-        /*------create request body------*/
-
-        RequestBody x = RequestBody.create(MediaType.parse("multipart/form-data"),
-                String.valueOf(client.getLocation().getX()));
-
-        RequestBody y = RequestBody.create(MediaType.parse("multipart/form-data"),
-                String.valueOf(client.getLocation().getY()));
-
-        /*------create call-------*/
-
-
-        Call<ClientModel> call = service.updateLocationOfClient(
-                client.getApplicationId(),
-                client.getClientId(),
-                x,
-                y);
-
-        try {
-            call.execute();
-        }catch(IOException e){
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * API Call
-     * get home server id
-     * @param client instance of client
-     *
-     */
-
-    public void getHomeServerId(ClientApp client){
-
-        /*------create call------*/
-
-        RequestBody weight = RequestBody.create(MediaType.parse("multipart/form-data"),
-                String.valueOf(client.getWeight()));
-
-
-        Call<ClientModel> call = service.updateHomeOfClient(
-                client.getApplicationId(),
-                client.getClientId(),
-                weight);
-
-        try {
-            Response<ClientModel> response = call.execute();
-            client.setHomeServerId(response.body().getHome());
-            System.out.println(response.body());
-            System.out.println("Client " + client.getClientId() + " 's Home got");
-        }catch(EOFException e){
-        }catch(IOException e){
-            e.printStackTrace();
-        }
-
-    }
-
-    /**
-     * API Call
-     * @param client クライアントのインスタンス
-     */
-    public void registerToServerWithId(ClientApp client){
 
         /*------create request body------*/
         RequestBody client_id = RequestBody.create(MediaType.parse("multipart/form-data"),
@@ -160,13 +66,68 @@ public class ManagementServiceForClient {
             client.setHomeServerId(response.body().getHome());
             System.out.println("Client " + client.getClientId() + " registered");
         }catch(EOFException e){
+            e.printStackTrace();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    } 
+
+    /**
+     * API Call
+     * register location to management server
+     **/
+
+    public void registerLocationToServer(ClientApp client){
+
+        /*------create request body------*/
+
+        RequestBody x = RequestBody.create(MediaType.parse("multipart/form-data"),
+                String.valueOf(client.getLocation().getX()));
+
+        RequestBody y = RequestBody.create(MediaType.parse("multipart/form-data"),
+                String.valueOf(client.getLocation().getY()));
+
+        Call<ClientModel> call = service.updateLocationOfClient(
+                client.getApplicationId(),
+                client.getClientId(),
+                x,
+                y);
+
+        try {
+            call.execute();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * API Call
+     * get home server id
+     * @param client instance of client
+     *
+     */
+
+    public void getHomeServerId(ClientApp client){
+
+        Call<ClientModel> call = service.updateHomeOfClient(
+                client.getApplicationId(),
+                client.getClientId());
+
+        try {
+            Response<ClientModel> response = call.execute();
+            client.setHomeServerId(response.body().getHome());
+            System.out.println("Response: " + response.body());
+            System.out.println("Client " + client.getClientId() + " 's Home was obtained");
+        }catch(EOFException e){
+            e.printStackTrace();
         }catch(IOException e){
             e.printStackTrace();
         }
 
     }
 
-    public void update_number_of_coopserver(int number_of_coopserver){
+
+    public void updateNumberOfCoopServer(int number_of_coopserver){
 
         /*------create request body------*/
         RequestBody numOfCoopServer = RequestBody.create(MediaType.parse("multipart/form-data"),
@@ -176,7 +137,7 @@ public class ManagementServiceForClient {
         Call<ClientModel> call = service.updateNumOfCoopServer(numOfCoopServer);
 
         try {
-            Response<ClientModel> response = call.execute();
+            call.execute();
         }catch(EOFException e){
             e.printStackTrace();
         }catch(IOException e){
