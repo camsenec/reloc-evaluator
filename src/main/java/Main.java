@@ -50,19 +50,25 @@ public class Main {
 
                 for (Integer sender_id : txLog.keySet()) {
                     client = new ClientApp(Config.application_id, sender_id);
-                    client.initialize();
                     ManagementServiceForClient.clientMap.putIfAbsent(client.getClientId(), client);
 
                     ArrayList<Integer> receivers = txLog.get(sender_id);
                     Point2D baseLocation = client.getLocation();
-                    //System.out.println("baselocation" + baseLocation);
                     for (int receiver : receivers) {
                         client = new ClientApp(Config.application_id, receiver);
-                        double locationX = Math.abs((baseLocation.getX() + random.nextGaussian() * 100) % Constants.MAX_X);
-                        double locationY = Math.abs((baseLocation.getX() + random.nextGaussian() * 100) % Constants.MAX_Y);
-                        client.initializeLocation(locationX, locationY);
+                        double locationX, locationY;
+                        while(true){
+                            locationX = baseLocation.getX() + random.nextGaussian() * Config.locality;
+                            if(locationX >= 0 && locationX <= Constants.MAX_X) break;
+                        }
+                        while(true){
+                            locationY = baseLocation.getY() + random.nextGaussian() * Config.locality;
+                            if(locationY >= 0 && locationY <= Constants.MAX_Y) break;
+                        }
+                        client.initialize(locationX, locationY);
                     }
                 }
+
             } else {
                 FileFactory.loadServerState("serverCache.csv", Config.capacityOfServers); //Why is it
                 FileFactory.loadClientState("clientCache.csv");
@@ -77,9 +83,8 @@ public class Main {
             for (int clientId : ManagementServiceForClient.clientMap.keySet()) {
                 ClientApp client = ManagementServiceForClient.clientMap.get(clientId);
                 client.assignHomeserver();
+                ManagementServiceForServer.serverMap.get(client.getHomeServerId()).addConnection();
             }
-
-
 
 
             /*Step 3 : Prepare Document */
@@ -141,33 +146,25 @@ public class Main {
                     homeClientMap.put(serverId, new ArrayList<>());
                 }
 
-                for (Integer clientId : txLog.keySet()) {
-                    ClientApp client = ManagementServiceForClient.clientMap.get(clientId);
-                    Integer homeId = client.getHomeServerId();
-                    homeClientMap.get(homeId).add(clientId);
+                for (Integer sender : txLog.keySet()) {
+                    int homeId = ManagementServiceForClient.clientMap.get(sender).getHomeServerId();
+                    homeClientMap.get(homeId).add(sender);
                 }
-
-                for (Integer a : homeClientMap.keySet()) {
-                    System.out.print(a + " : ");
-                    ArrayList<Integer> b = homeClientMap.get(a);
-                    for (Integer id : b) {
-                        System.out.print(id + " ");
+                
+                if(Constants.DEBUG){
+                    for (Integer a : homeClientMap.keySet()) {
+                        System.out.print(a + " : ");
+                        ArrayList<Integer> b = homeClientMap.get(a);
+                        for (Integer id : b) {
+                            System.out.print(id + " ");
+                        }
                     }
                 }
 
                 //1. Y_1
-                int pubSizeSum;
                 HashMap<Integer, Double> rMap = new HashMap<>();
                 for (Integer serverId : homeClientMap.keySet()) {
-                    ArrayList<Integer> C_l = homeClientMap.get(serverId);
                     MecHost s_l = ManagementServiceForServer.serverMap.get(serverId);
-                    pubSizeSum = 0;
-                    for (Integer clientId : C_l) {
-                        ArrayList<Integer> publishDocs = txLogDocs.get(clientId); //pubDocsは排他的
-                        if (publishDocs != null) {
-                            pubSizeSum += publishDocs.size();
-                        }
-                    }
                     if (Config.capacityOfServers >= s_l.getUsed()) {
                         rMap.put(serverId, 0.0);
                     } else {
@@ -176,32 +173,21 @@ public class Main {
                 }
 
                 double sum = 0;
-                for (Integer serverId : rMap.keySet()) {
-                    sum += rMap.get(serverId);
+                for (double r : rMap.values()) {
+                    sum += r;
                 }
                 Metric.MET_1 = sum / Config.numberOfServers;
 
-                for (double r : rMap.values()) {
-                    System.out.println(r);
-                }
-
-
-                //2.Y_2
-                HashMap<Integer, Integer> connectionNumMap = new HashMap<>();
-                for (Integer serverId : homeClientMap.keySet()) {
-                    ArrayList<Integer> C_l = homeClientMap.get(serverId);
-                    connectionNumMap.put(serverId, C_l.size());
-                }
-
+                //2. Y_2
                 sum = 0;
-                for (Integer serverId : connectionNumMap.keySet()) {
-                    sum += connectionNumMap.get(serverId);
+                for (MecHost server : ManagementServiceForServer.serverMap.values()) {
+                    sum += server.getConnection();
                 }
                 double ave = sum / Config.numberOfServers;
 
                 sum = 0;
-                for (Integer serverId : connectionNumMap.keySet()) {
-                    sum += (connectionNumMap.get(serverId) - ave) * (connectionNumMap.get(serverId) - ave);
+                for (MecHost server : ManagementServiceForServer.serverMap.values()) {
+                    sum += (server.getConnection() - ave) * (server.getConnection() - ave);
                 }
                 Metric.MET_2 = Math.sqrt((double) sum / (Config.numberOfServers - 1));
 
