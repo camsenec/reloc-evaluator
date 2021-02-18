@@ -50,15 +50,15 @@ public class ClientApp {
         service.registerToServerWithId(this);
     }
 
-    public void initialize_loc(double locationX, double locationY){
+    public void assignHomeserver(){
+        service.getHomeServerId(this);
+    }
+
+    public void initializeLocation(double locationX, double locationY){
         this.location.setX(locationX);
         this.location.setY(locationY);
         //register to server
         service.registerToServerWithId(this);
-    }
-
-    public void relocate(){
-        service.getHomeServerId(this);
     }
 
     private void initializeLocation(){
