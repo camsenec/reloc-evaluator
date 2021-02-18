@@ -214,7 +214,7 @@ public class Main {
                 for (Integer serverId : distanceMap.keySet()) {
                     sum += distanceMap.get(serverId);
                 }
-                Metric.MET_3 = sum / txLog.size();
+                Metric.MET_3 = sum / (ManagementServiceForClient.clientMap.size());
 
 
                 //4.Y
@@ -228,8 +228,11 @@ public class Main {
                 double alpha = 5;
                 double beta = 1;
                 double gamma = 0.1;
+                double gamma_2 = 0.001;
                 double y_0, y_1, y_2, y_3;
                 double y;
+
+                /*
                 y_1 = y_2 = y_3 = 0;
 
                 y_0 = t_mn * N * M;
@@ -259,6 +262,7 @@ public class Main {
 
                 System.out.println(y_0 + " " + y_1 + " " + y_2 + " " + y_3);
             }
+            */
 
 
             if (Constants.SAVE) {
