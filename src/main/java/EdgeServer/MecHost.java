@@ -48,8 +48,13 @@ public class MecHost {
 
     public void addUsed(int sizeOfDoc){
         this.used += sizeOfDoc;
+        service.updateState(this);
     }
 
+    public void addConnection(){
+        this.connection++;
+        service.updateState(this);
+    }
 
     public void resetState(){
         this.used = 0;
