@@ -33,32 +33,6 @@ public class ClientApp {
         service.registerToServer(this);
     }
 
-    public void update(){
-        updateLocation();
-        updateHomeServer();
-    }
-
-    private void updateLocation() {
-        Random random = new Random();
-        double areaLengthX = Constants.MAX_X - Constants.MIN_X;
-        double areaLengthY = Constants.MAX_Y - Constants.MIN_Y;
-
-        this.location.setX((location.getX()
-                + random.nextGaussian()) % areaLengthX + Constants.MIN_X);
-        this.location.setY((location.getY()
-                + random.nextGaussian()) % areaLengthY + Constants.MIN_Y);
-
-        if(location.getX() < 0) this.location.setX(location.getX() + areaLengthX);
-        if(location.getY() < 0) this.location.setY(location.getY() + areaLengthY);
-
-        service.registerLocationToServer(this);
-    }
-
-    private void updateHomeServer(){
-        service.getHomeServerId(this);
-    }
-
-
     public int getApplicationId() {
         return applicationId;
     }

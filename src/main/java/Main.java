@@ -51,12 +51,15 @@ public class Main {
                 for (Integer sender_id : txLog.keySet()) {
                     client = new ClientApp(Config.application_id, sender_id);
                     ManagementServiceForClient.clientMap.putIfAbsent(client.getClientId(), client);
+                    double areaLengthX = Constants.MAX_X - Constants.MIN_X;
+                    double locationX = Constants.MIN_X + random.nextDouble() * (Constants.MAX_X - Constants.MIN_X);
+                    double locationY = Constants.MIN_Y + random.nextDouble() * (Constants.MAX_Y - Constants.MIN_Y);
+                    client.initialize(locationX, locationY);
 
                     ArrayList<Integer> receivers = txLog.get(sender_id);
                     Point2D baseLocation = client.getLocation();
                     for (int receiver : receivers) {
                         client = new ClientApp(Config.application_id, receiver);
-                        double locationX, locationY;
                         while(true){
                             locationX = baseLocation.getX() + random.nextGaussian() * Config.locality;
                             if(locationX >= 0 && locationX <= Constants.MAX_X) break;
@@ -193,34 +196,25 @@ public class Main {
 
                 //3.Y_3
                 HashMap<Integer, Double> distanceMap = new HashMap<>();
-                double distSum;
-                int count_tmp = 0;
                 for (Integer serverId : homeClientMap.keySet()) {
                     ArrayList<Integer> C_l = homeClientMap.get(serverId);
                     MecHost s_l = ManagementServiceForServer.serverMap.get(serverId);
-                    distSum = 0;
+                    double distSum = 0;
                     for (Integer clientId : C_l) {
                         ClientApp c_m = ManagementServiceForClient.clientMap.get(clientId);
                         double x_dist = Math.abs(c_m.getLocation().getX() - s_l.getLocation().getX());
                         double y_dist = Math.abs(c_m.getLocation().getY() - s_l.getLocation().getY());
                         double dist = Math.sqrt(x_dist * x_dist + y_dist * y_dist);
                         distSum += dist;
-                        count_tmp++;
                     }
                     distanceMap.put(serverId, distSum);
                 }
-                System.out.println("count" + count_tmp);
-                System.out.println("size" + ManagementServiceForClient.clientMap.size());
 
                 sum = 0;
                 for (Integer serverId : distanceMap.keySet()) {
                     sum += distanceMap.get(serverId);
                 }
                 Metric.MET_3 = sum / txLog.size();
-
-                for (Integer serverId : connectionNumMap.keySet()) {
-                    System.out.println(connectionNumMap.get(serverId));
-                }
 
 
                 //4.Y
