@@ -40,7 +40,7 @@ public class ManagementServiceForClient {
    
     /**
      * API Call
-     * @param client クライアントのインスタンス
+     * @param client Instance of ClientApp
      */
     public void registerToServer(ClientApp client){
 

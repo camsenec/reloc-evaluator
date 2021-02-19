@@ -37,11 +37,10 @@ public class ManagementServiceForServer {
 
     /**
      * API Call
-     * @param host MECHostのインスタンス
+     * @param host Instance of MecHost
      */
     public void registerToServer(MecHost host){
 
-        /*------create request body------*/
 
         RequestBody x = RequestBody.create(MediaType.parse("multipart/form-data"),
                 String.valueOf(host.getLocation().getX()));
@@ -77,7 +76,6 @@ public class ManagementServiceForServer {
         RequestBody used = RequestBody.create(MediaType.parse("multipart/form-data"),
                 String.valueOf(server.getUsed()));
 
-        /*------create call------*/
 
         Call<EdgeServerModel> call = service.updateServerStatus(
                 server.getApplicationId(),
