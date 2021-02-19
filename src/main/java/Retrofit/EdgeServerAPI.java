@@ -19,8 +19,8 @@ public interface EdgeServerAPI {
     @PUT("api/v1/manager/server/update_used/")
     Call<EdgeServerModel> updateServerStatus(@Query("application_id") int application_id,
                                              @Query("server_id") int server_id,
-                                             @Part("capacity") RequestBody capacity,
-                                             @Part("used") RequestBody used);
+                                             @Part("used") RequestBody used,
+                                             @Part("connection") RequestBody connection);
 
 
 

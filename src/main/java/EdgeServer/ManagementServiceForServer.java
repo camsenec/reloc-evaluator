@@ -70,18 +70,18 @@ public class ManagementServiceForServer {
 
     public void updateState(MecHost server){
 
-        RequestBody capacity = RequestBody.create(MediaType.parse("multipart/form-data"),
-                String.valueOf(server.getCapacity()));
-
         RequestBody used = RequestBody.create(MediaType.parse("multipart/form-data"),
                 String.valueOf(server.getUsed()));
+        
+        RequestBody connection = RequestBody.create(MediaType.parse("multipart/form-data"),
+                String.valueOf(server.getConnection()));
 
 
         Call<EdgeServerModel> call = service.updateServerStatus(
                 server.getApplicationId(),
                 server.getServerId(),
-                capacity,
-                used);
+                used,
+                connection);
 
         try {
             call.execute();
