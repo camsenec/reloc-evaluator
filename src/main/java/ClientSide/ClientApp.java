@@ -1,9 +1,6 @@
 package ClientSide;
 
-import Constants.Constants;
 import Field.Point2D;
-
-import java.util.Random;
 
 public class ClientApp {
 

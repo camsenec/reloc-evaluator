@@ -2,8 +2,6 @@ package Data;
 
 import Config.Config;
 
-import java.util.ArrayList;
-import java.util.UUID;
 
 public class Document {
     /** METADATA **/
