@@ -113,7 +113,6 @@ public class Main {
                     for (int documentId : publishedDocuments) {
                         Document document = DataBase.dataBase.get(documentId);
 
-                        List<Integer> receivers = txLog.get(senderId);
                         int homeId = ManagementServiceForClient.clientMap.get(senderId).getHomeServerId();
                         MecHost server = ManagementServiceForServer.serverMap.get(homeId);
                         Document isExist = server.getCollection().putIfAbsent(document.getDocumentId(), document);
@@ -127,6 +126,7 @@ public class Main {
                             System.out.format("Document %d has already been stored!", documentId);
                         }
 
+                        List<Integer> receivers = txLog.get(senderId);
                         for (int receiverId : receivers) {
                             /* get home server of a receiver*/
                             homeId = ManagementServiceForClient.clientMap.get(receiverId).getHomeServerId();
@@ -147,20 +147,20 @@ public class Main {
             }
 
             if (Constants.TEST) {
-                HashMap<Integer, ArrayList<Integer>> homeClientMap = new HashMap<>();
+                HashMap<Integer, ArrayList<Integer>> homeClientsMap = new HashMap<>();
                 for (Integer serverId : ManagementServiceForServer.serverMap.keySet()) {
-                    homeClientMap.put(serverId, new ArrayList<>());
+                    homeClientsMap.put(serverId, new ArrayList<>());
                 }
 
-                for (Integer sender : txLog.keySet()) {
-                    int homeId = ManagementServiceForClient.clientMap.get(sender).getHomeServerId();
-                    homeClientMap.get(homeId).add(sender);
+                for (int clientId : ManagementServiceForClient.clientMap.keySet()) {
+                    int homeId = ManagementServiceForClient.clientMap.get(clientId).getHomeServerId();
+                    homeClientsMap.get(homeId).add(clientId);
                 }
                 
                 if(Constants.DEBUG){
-                    for (Integer a : homeClientMap.keySet()) {
+                    for (Integer a : homeClientsMap.keySet()) {
                         System.out.print(a + " : ");
-                        ArrayList<Integer> b = homeClientMap.get(a);
+                        ArrayList<Integer> b = homeClientsMap.get(a);
                         for (int i : b) {
                             System.out.print(i + " ");
                         }
@@ -169,7 +169,7 @@ public class Main {
 
                 //1. Y_1
                 HashMap<Integer, Double> rMap = new HashMap<>();
-                for (Integer serverId : homeClientMap.keySet()) {
+                for (Integer serverId : homeClientsMap.keySet()) {
                     MecHost s_l = ManagementServiceForServer.serverMap.get(serverId);
                     if (Config.capacityOfServers >= s_l.getUsed()) {
                         rMap.put(serverId, 0.0);
@@ -199,8 +199,8 @@ public class Main {
 
                 //3.Y_3
                 HashMap<Integer, Double> distanceMap = new HashMap<>();
-                for (Integer serverId : homeClientMap.keySet()) {
-                    ArrayList<Integer> C_l = homeClientMap.get(serverId);
+                for (int serverId : homeClientsMap.keySet()) {
+                    ArrayList<Integer> C_l = homeClientsMap.get(serverId);
                     MecHost s_l = ManagementServiceForServer.serverMap.get(serverId);
                     double distSum = 0;
                     for (Integer clientId : C_l) {
@@ -214,7 +214,7 @@ public class Main {
                 }
 
                 sum = 0;
-                for (Integer serverId : distanceMap.keySet()) {
+                for (int serverId : distanceMap.keySet()) {
                     sum += distanceMap.get(serverId);
                 }
                 Metric.MET_3 = sum / (ManagementServiceForClient.clientMap.size());
@@ -224,7 +224,7 @@ public class Main {
                 //4.1 Constants
                 int A = Config.capacityOfServers;
                 int B = 100;
-                int t_mn = 5;
+                int dc = 5;
                 int L = Config.numberOfServers;
                 int M = txLog.size();
                 int N = 3;
@@ -236,9 +236,38 @@ public class Main {
                 double y;
                 
                 //The same data flow with the data flow in txLog
-                for(int sender: txLog.keySet()){
-
+                double di = 0;
+                for(int senderId: txLog.keySet()){
+                    ClientApp sender = ManagementServiceForClient.clientMap.get(senderId);
+                    int senderHomeId = sender.getHomeServerId();
+                    MecHost senderHome = ManagementServiceForServer.serverMap.get(senderHomeId);
+                    double x_dist = Math.abs(sender.getLocation().getX() - senderHome.getLocation().getX());
+                    double y_dist = Math.abs(sender.getLocation().getY() - senderHome.getLocation().getY());
+                    
+                    double dl1h = beta * Math.max(homeClientsMap.get(senderHomeId).size() - B, 0);
+                    double dl2h = gamma * Math.sqrt(x_dist * x_dist + y_dist * y_dist);
+                    double dlh = dl1h + dl2h;
+                    double dmp = dlh + rMap.get(senderHomeId) * dc;
+                    
+                    ArrayList<Integer> receivers = txLog.get(senderId); 
+                    double dms_sum = 0;
+                    for(int receiverId: receivers){
+                        ClientApp receiver = ManagementServiceForClient.clientMap.get(receiverId);
+                        int receiverHomeId = receiver.getHomeServerId();
+                        MecHost receiverHome = ManagementServiceForServer.serverMap.get(receiverHomeId);
+                        x_dist = Math.abs(receiver.getLocation().getX() - receiverHome.getLocation().getX());
+                        y_dist = Math.abs(receiver.getLocation().getY() - receiverHome.getLocation().getY());
+                    
+                        dl1h = beta * Math.max(homeClientsMap.get(receiverHomeId).size() - B, 0);
+                        dl2h = gamma * Math.sqrt(x_dist * x_dist + y_dist * y_dist);
+                        dlh = dl1h + dl2h;
+                        dms_sum += dlh + rMap.get(receiverHomeId) * dc;
+                    }
+                    double dms = dms_sum / receivers.size();
+                    di += (dmp + dms);
                 }
+                Metric.MET_4 = di / txLog.keySet().size();
+                
 
                 /*
                 y_1 = y_2 = y_3 = 0;
