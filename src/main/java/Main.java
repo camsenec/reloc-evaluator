@@ -54,10 +54,10 @@ public class Main {
                 for (int senderId : txLog.keySet()) {
                     client = new ClientApp(Config.application_id, senderId);
                     ManagementServiceForClient.clientMap.putIfAbsent(client.getClientId(), client);
-                    double areaLengthX = Constants.MAX_X - Constants.MIN_X;
                     double locationX = Constants.MIN_X + random.nextDouble() * (Constants.MAX_X - Constants.MIN_X);
                     double locationY = Constants.MIN_Y + random.nextDouble() * (Constants.MAX_Y - Constants.MIN_Y);
                     client.initialize(locationX, locationY);
+                    ManagementServiceForServer.serverMap.get(client.getHomeServerId()).addConnection();
 
                     ArrayList<Integer> receivers = txLog.get(senderId);
                     Point2D baseLocation = client.getLocation();
@@ -72,6 +72,8 @@ public class Main {
                             if(locationY >= 0 && locationY <= Constants.MAX_Y) break;
                         }
                         client.initialize(locationX, locationY);
+                        ManagementServiceForServer.serverMap.get(client.getHomeServerId()).addConnection();
+                        
                     }
                 }
 
@@ -147,6 +149,17 @@ public class Main {
             }
 
             if (Constants.TEST) {
+                //Constants
+                int A = Config.capacityOfServers;
+                int B = 100;
+                int dc = 5;
+                int L = Config.numberOfServers;
+                int N = txLog.size();
+                int M = ManagementServiceForClient.clientMap.size();
+                double beta = 1;
+                double gamma = 0.1;
+                double gamma_2 = 0.001;
+
                 HashMap<Integer, ArrayList<Integer>> homeClientsMap = new HashMap<>();
                 for (Integer serverId : ManagementServiceForServer.serverMap.keySet()) {
                     homeClientsMap.put(serverId, new ArrayList<>());
@@ -171,10 +184,10 @@ public class Main {
                 HashMap<Integer, Double> rMap = new HashMap<>();
                 for (Integer serverId : homeClientsMap.keySet()) {
                     MecHost s_l = ManagementServiceForServer.serverMap.get(serverId);
-                    if (Config.capacityOfServers >= s_l.getUsed()) {
+                    if (A >= s_l.getUsed()) {
                         rMap.put(serverId, 0.0);
                     } else {
-                        rMap.put(serverId, 1 - (Config.capacityOfServers / (double) s_l.getUsed()));
+                        rMap.put(serverId, 1 - (A / (double) s_l.getUsed()));
                     }
                 }
 
@@ -182,20 +195,20 @@ public class Main {
                 for (double r : rMap.values()) {
                     sum += r;
                 }
-                Metric.MET_1 = sum / Config.numberOfServers;
+                Metric.MET_1 = sum / L;
 
                 //2. Y_2
                 sum = 0;
                 for (MecHost server : ManagementServiceForServer.serverMap.values()) {
                     sum += server.getConnection();
                 }
-                double ave = sum / Config.numberOfServers;
+                double ave = sum / L;
 
                 sum = 0;
                 for (MecHost server : ManagementServiceForServer.serverMap.values()) {
                     sum += (server.getConnection() - ave) * (server.getConnection() - ave);
                 }
-                Metric.MET_2 = Math.sqrt((double) sum / (Config.numberOfServers - 1));
+                Metric.MET_2 = Math.sqrt((double) sum / (L - 1));
 
                 //3.Y_3
                 HashMap<Integer, Double> distanceMap = new HashMap<>();
@@ -217,24 +230,10 @@ public class Main {
                 for (int serverId : distanceMap.keySet()) {
                     sum += distanceMap.get(serverId);
                 }
-                Metric.MET_3 = sum / (ManagementServiceForClient.clientMap.size());
+                Metric.MET_3 = sum / M;
 
 
                 //4.Y
-                //4.1 Constants
-                int A = Config.capacityOfServers;
-                int B = 100;
-                int dc = 5;
-                int L = Config.numberOfServers;
-                int M = txLog.size();
-                int N = 3;
-                double alpha = 5;
-                double beta = 1;
-                double gamma = 0.1;
-                double gamma_2 = 0.001;
-                double y_0, y_1, y_2, y_3;
-                double y;
-                
                 //The same data flow with the data flow in txLog
                 double di = 0;
                 for(int senderId: txLog.keySet()){
@@ -266,41 +265,9 @@ public class Main {
                     double dms = dms_sum / receivers.size();
                     di += (dmp + dms);
                 }
-                Metric.MET_4 = di / txLog.keySet().size();
-                
-
-                /*
-                y_1 = y_2 = y_3 = 0;
-
-                y_0 = t_mn * N * M;
-
-                for (int serverId : ManagementServiceForServer.serverMap.keySet()) {
-                    y_1 += rMap.get(serverId) * connectionNumMap.get(serverId);
-                }
-                y_1 = y_1 * alpha * N * t_mn;
-
-                for (int serverId : ManagementServiceForServer.serverMap.keySet()) {
-                    int connectionNum = connectionNumMap.get(serverId);
-                    if (connectionNum > B) {
-                        y_2 += connectionNum * (connectionNum - B);
-                    } else {
-                        y_2 += 0;
-                    }
-                }
-                y_2 = y_2 * beta * N;
-
-                for (int serverId : ManagementServiceForServer.serverMap.keySet()) {
-                    y_3 += distanceMap.get(serverId);
-                }
-                y_3 = y_3 * gamma * N;
-
-                y = y_0 + y_1 + y_2 + y_3;
-                Metric.MET_4 = y;
-
-                System.out.println(y_0 + " " + y_1 + " " + y_2 + " " + y_3);
+                Metric.MET_4 = di / N;
             }
-            */
-
+                
 
             if (Constants.SAVE) {
                 FileFactory.saveServerState();

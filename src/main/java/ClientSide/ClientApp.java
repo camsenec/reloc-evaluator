@@ -27,7 +27,6 @@ public class ClientApp {
     public void initializeLocation(double locationX, double locationY){
         this.location.setX(locationX);
         this.location.setY(locationY);
-        service.registerToServer(this);
     }
 
     public int getApplicationId() {
