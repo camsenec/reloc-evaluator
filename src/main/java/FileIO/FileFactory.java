@@ -147,7 +147,6 @@ public class FileFactory {
     public static void saveClientState(){
         try {
 
-            // 出力ファイルの作成
             FileWriter f = new FileWriter("./Cache/clientCache.csv", false);
             PrintWriter p = new PrintWriter(new BufferedWriter(f));
             for(int clientId : ManagementServiceForClient.clientMap.keySet()){
