@@ -51,15 +51,15 @@ public class Main {
                 ClientApp client;
                 Random random = new Random();
 
-                for (Integer sender_id : txLog.keySet()) {
-                    client = new ClientApp(Config.application_id, sender_id);
+                for (int senderId : txLog.keySet()) {
+                    client = new ClientApp(Config.application_id, senderId);
                     ManagementServiceForClient.clientMap.putIfAbsent(client.getClientId(), client);
                     double areaLengthX = Constants.MAX_X - Constants.MIN_X;
                     double locationX = Constants.MIN_X + random.nextDouble() * (Constants.MAX_X - Constants.MIN_X);
                     double locationY = Constants.MIN_Y + random.nextDouble() * (Constants.MAX_Y - Constants.MIN_Y);
                     client.initialize(locationX, locationY);
 
-                    ArrayList<Integer> receivers = txLog.get(sender_id);
+                    ArrayList<Integer> receivers = txLog.get(senderId);
                     Point2D baseLocation = client.getLocation();
                     for (int receiver : receivers) {
                         client = new ClientApp(Config.application_id, receiver);
@@ -81,7 +81,7 @@ public class Main {
             }
 
 
-            for (Integer serverId : ManagementServiceForServer.serverMap.keySet()) {
+            for (int serverId : ManagementServiceForServer.serverMap.keySet()) {
                 MecHost server = ManagementServiceForServer.serverMap.get(serverId);
                 server.resetState();
             }
@@ -94,27 +94,27 @@ public class Main {
 
 
             /*Step 3 : Prepare Document */
-            int document_id = 1;
-            for (Integer sender_id : txLog.keySet()) {
+            int id = 1;
+            for (int senderId : txLog.keySet()) {
                 ArrayList<Integer> docList = new ArrayList<>();
                 for (int i = 0; i < Config.numberOfDocsPerClients; i++) {
-                    Document document = new Document(Config.application_id, document_id);
+                    Document document = new Document(Config.application_id, id);
                     document.initialize(Config.sizeOfDocs);
-                    DataBase.dataBase.put(document_id, document);
-                    docList.add(document_id++);
+                    DataBase.dataBase.put(id, document);
+                    docList.add(id++);
                 }
-                txLogDocs.put(sender_id, docList);
+                txLogDocs.put(senderId, docList);
             }
 
             if (Constants.SIMULATION) {
-                for (int sender_id : txLog.keySet()) {
-                    ArrayList<Integer> publishedDocuments = txLogDocs.get(sender_id);
+                for (int senderId : txLog.keySet()) {
+                    ArrayList<Integer> publishedDocuments = txLogDocs.get(senderId);
 
                     for (int documentId : publishedDocuments) {
                         Document document = DataBase.dataBase.get(documentId);
 
-                        List<Integer> receivers = txLog.get(sender_id);
-                        int homeId = ManagementServiceForClient.clientMap.get(sender_id).getHomeServerId();
+                        List<Integer> receivers = txLog.get(senderId);
+                        int homeId = ManagementServiceForClient.clientMap.get(senderId).getHomeServerId();
                         MecHost server = ManagementServiceForServer.serverMap.get(homeId);
                         Document isExist = server.getCollection().putIfAbsent(document.getDocumentId(), document);
                         Result.numberOfCachedDocument++;
@@ -161,8 +161,8 @@ public class Main {
                     for (Integer a : homeClientMap.keySet()) {
                         System.out.print(a + " : ");
                         ArrayList<Integer> b = homeClientMap.get(a);
-                        for (Integer id : b) {
-                            System.out.print(id + " ");
+                        for (int i : b) {
+                            System.out.print(i + " ");
                         }
                     }
                 }
@@ -236,7 +236,7 @@ public class Main {
                 double y;
                 
                 //The same data flow with the data flow in txLog
-                for(ClientApp sender: txLog.keySet()){
+                for(int sender: txLog.keySet()){
 
                 }
 
