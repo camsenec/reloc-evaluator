@@ -6,6 +6,7 @@ import EdgeServer.ManagementServiceForServer;
 import EdgeServer.MecHost;
 import Constants.Constants;
 import Field.Point2D;
+import FileIO.FileDownloader;
 import FileIO.FileFactory;
 
 import java.util.ArrayList;
@@ -26,14 +27,16 @@ public class Main {
 
         ManagementServiceForClient service = new ManagementServiceForClient();
 
+        FileDownloader.downlaodLogFile(Constants.BASE_URL + "simulation/out/tx_log.csv");
+        FileFactory.loadLogFile("tx_log.csv");
+
+
         /* read command line argument */
         for (int t = 1; t <= 100; t++) {
             Result.reset();
             if (t == 1) Constants.first();
             else Constants.notFirst();
             service.updateNumberOfCoopServer(t);
-
-            FileFactory.loadLogFile("txLog.csv");
 
             if (Constants.UPLOAD) {
                 /* Step 1 : Register server to a management server */
@@ -231,6 +234,11 @@ public class Main {
                 double gamma_2 = 0.001;
                 double y_0, y_1, y_2, y_3;
                 double y;
+                
+                //The same data flow with the data flow in txLog
+                for(ClientApp sender: txLog.keySet()){
+
+                }
 
                 /*
                 y_1 = y_2 = y_3 = 0;
