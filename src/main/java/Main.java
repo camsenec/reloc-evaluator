@@ -24,6 +24,7 @@ import static Logger.TxLog.txLogDocs;
 public class Main {
 
     public static void main(String args[]) {
+        boolean RLCCA = false;
 
         ManagementServiceForClient service = new ManagementServiceForClient();
 

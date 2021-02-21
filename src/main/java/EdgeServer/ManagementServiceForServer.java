@@ -60,7 +60,7 @@ public class ManagementServiceForServer {
 
         try {
             Response<EdgeServerModel> response = call.execute();
-            host.setServerId(response.body().getServer_id());
+            host.setServerId(response.body().getServerId());
             System.out.println("Server " + host.getServerId() + " was registered");
         }catch(IOException e){
             e.printStackTrace();

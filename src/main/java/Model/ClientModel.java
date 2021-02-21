@@ -3,14 +3,14 @@ package Model;
 public class ClientModel {
 
     private int application_id;
-    private int client_id;
+    private int clientId;
     private float x;
     private float y;
     private int home;
 
     public ClientModel(int application_id, int clientId, float x, float y, int home) {
         this.application_id = application_id;
-        this.client_id = clientId;
+        this.clientId = clientId;
         this.x = x;
         this.y = y;
         this.home = home;
@@ -25,11 +25,11 @@ public class ClientModel {
     }
 
     public int getClientId() {
-        return client_id;
+        return clientId;
     }
 
     public void setClientId(int clientId) {
-        this.client_id = clientId;
+        this.clientId = clientId;
     }
 
     public float getX() {
@@ -60,7 +60,7 @@ public class ClientModel {
     public String toString() {
         return "ClientModel{" +
                 "application_id=" + application_id +
-                ", clientId=" + client_id +
+                ", clientId=" + clientId +
                 ", x=" + x +
                 ", y=" + y +
                 ", home=" + home +
