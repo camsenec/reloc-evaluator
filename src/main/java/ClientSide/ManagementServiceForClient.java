@@ -111,7 +111,30 @@ public class ManagementServiceForClient {
 
         Call<ClientModel> call = service.updateHomeOfClient(
                 client.getApplicationId(),
-                client.getClientId());
+                client.getClientId(),
+                1,
+                0);
+
+        try {
+            Response<ClientModel> response = call.execute();
+            client.setHomeServerId(response.body().getHome());
+            System.out.println("Response: " + response.body());
+            System.out.println("Client " + client.getClientId() + " 's Home was obtained");
+        }catch(EOFException e){
+            e.printStackTrace();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+
+    }
+
+    public void getHomeServerId(ClientApp client, int plus_connection, int plus_used){
+
+        Call<ClientModel> call = service.updateHomeOfClient(
+                client.getApplicationId(),
+                client.getClientId(),
+                plus_connection,
+                plus_used);
 
         try {
             Response<ClientModel> response = call.execute();

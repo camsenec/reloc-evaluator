@@ -47,7 +47,9 @@ public interface EdgeServerAPI {
     @Multipart
     @PUT("api/v1/manager/user/update_home/")
     Call<ClientModel> updateHomeOfClient(@Query("application_id") int application_id,
-                                         @Query("client_id") int client_id);
+                                         @Query("client_id") int client_id,
+                                         @Part("plus_connection") int plus_connection,
+                                         @Part("plus_used") int plus_used);
 
     @Multipart
     @PUT("api/v1/manager/area/update_number_of_coopserver/")

@@ -7,7 +7,7 @@ import Field.Point2D;
 
 import java.util.HashMap;
 import java.util.Random;
-
+import MP.MessageProcessor;
 
 public class MecHost {
     private int applicationId;
@@ -17,6 +17,7 @@ public class MecHost {
     private int capacity;
     private int connection;
     private HashMap<Integer, Document> collection = new HashMap<>();
+    private HashMap<Integer, MessageProcessor> MPmap = new HashMap<>();
     private static final ManagementServiceForServer service = new ManagementServiceForServer();
 
     /**
@@ -51,8 +52,8 @@ public class MecHost {
         service.updateState(this);
     }
 
-    public void addConnection(){
-        this.connection++;
+    public void addConnection(int connection){
+        this.connection+=connection;
         service.updateState(this);
     }
 
@@ -114,6 +115,10 @@ public class MecHost {
 
     public HashMap<Integer, Document> getCollection() {
         return collection;
+    }
+
+    public HashMap<Integer, MessageProcessor> getMPmap() {
+        return MPmap;
     }
 
     @Override

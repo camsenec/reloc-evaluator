@@ -1,11 +1,13 @@
+import java.util.ArrayList;
+
 import ClientSide.ManagementServiceForClient;
+import MP.MessageProcessor;
 
 public class test {
 
     public static void main(String[] args) {
-
-        ManagementServiceForClient service = new ManagementServiceForClient();
-        service.updateNumberOfCoopServer(20);
+        ArrayList<MessageProcessor> a = new ArrayList<>();
+        MessageProcessor mp = new MessageProcessor();
     }
 
         /*

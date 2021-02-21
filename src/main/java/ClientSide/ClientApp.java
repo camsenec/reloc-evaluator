@@ -24,6 +24,10 @@ public class ClientApp {
         service.getHomeServerId(this);
     }
 
+    public void assignHomeserver(int plus_connection, int plus_used){
+        service.getHomeServerId(this, plus_connection, plus_used);
+    }
+
     public void initializeLocation(double locationX, double locationY){
         this.location.setX(locationX);
         this.location.setY(locationY);
