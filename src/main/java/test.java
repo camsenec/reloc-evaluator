@@ -1,13 +1,17 @@
-import java.util.ArrayList;
+import java.util.HashMap;
 
-import ClientSide.ManagementServiceForClient;
-import MP.MessageProcessor;
 
 public class test {
 
     public static void main(String[] args) {
-        ArrayList<MessageProcessor> a = new ArrayList<>();
-        MessageProcessor mp = new MessageProcessor();
+        HashMap<Integer, Integer> a = new HashMap<>();
+        a.put(1,1);
+        a.put(2,2);
+        a.put(3,3);
+        System.out.println(a.size());
+        a.remove(1);
+        System.out.println(a.size());
+        
     }
 
         /*

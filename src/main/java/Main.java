@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import Result.Result;
 import Config.Config;
@@ -90,8 +89,8 @@ public class Main {
             FileFactory.loadServerState("serverCache.csv", Config.capacityOfServers); //Why is it
             FileFactory.loadClientState("clientCache.csv");
         }
-
-
+        
+        
         for (int serverId : ManagementServiceForServer.serverMap.keySet()) {
             MecHost server = ManagementServiceForServer.serverMap.get(serverId);
             server.resetState();
@@ -174,17 +173,19 @@ public class Main {
                             boolean isMPExist = server.getMPmap().containsKey(senderId);
                             //If a new document is published, update the server state
                             // even if null, the doc was put to the database
+                            //System.out.println("EXIST: " + isMPExist);
                             
                             if (isDocExist == null && !isMPExist) {
                                 server.addUsed(document.getSize());
                                 mp = new MessageProcessor();
                                 mp.getDocMap().put(documentId, document);
                                 mp.getClientMap().putIfAbsent(receiverId, ManagementServiceForClient.clientMap.get(receiverId));
-                                server.getMPmap().put(senderId, mp);
+                                server.getMPmap().putIfAbsent(senderId, mp);
                             } else if(isDocExist == null && isMPExist) {
                                 server.addUsed(document.getSize());
                                 mp.getDocMap().put(documentId, document);
                                 mp.getClientMap().putIfAbsent(receiverId, ManagementServiceForClient.clientMap.get(receiverId));
+                                server.getMPmap().putIfAbsent(senderId, mp);
                             } else {
                                 Result.saved++;
                                 System.out.format("Document %d has already been stored!\n", documentId);
@@ -196,16 +197,22 @@ public class Main {
                                 receiver.assignHomeserver(movedMP.getClientMap().size(), movedMP.getDocMap().size());
                                 HashMap<Integer, ClientApp> clients = movedMP.getClientMap();
                                 for(ClientApp client : clients.values()){
-                                    client.setHomeServerId(receiver.getHomeServerId());
+                                    client.updateState(receiver.getHomeServerId());
                                 }
                                 MecHost newHome =  ManagementServiceForServer.serverMap.get(receiver.getHomeServerId());
-                                System.out.println("EQUALS?: " + preHome.equals(newHome));
+                                System.out.println("HOME UPDATED");
                                 newHome.getMPmap().put(senderId, movedMP);
                                 newHome.addUsed(Config.sizeOfDocs * movedMP.getDocMap().size());
                                 newHome.addConnection(movedMP.getClientMap().size());
+                                for(int i: movedMP.getDocMap().keySet()){
+                                  newHome.getCollection().putIfAbsent(i, movedMP.getDocMap().get(i));
+                                }
                                 preHome.getMPmap().remove(senderId);
                                 preHome.addUsed(-Config.sizeOfDocs * movedMP.getDocMap().size());
                                 preHome.addConnection(-movedMP.getClientMap().size());
+                                for(int i: movedMP.getDocMap().keySet()){
+                                  preHome.getCollection().remove(i);
+                                }
                             }
                         }
                     }

@@ -8,3 +8,5 @@ numberofclusters
 numberOfSender,numberOfClient,kindOfDocument,numberOfCachedDocument,meanOfUsed,meanOfCachedDocs,minOfUsed,maxOfUsed,saved,rateOfsaved
 
 914,1865,914,8394,78.97,78.97,13.0,427.0,497,0.0592089588
+914,1865,914,8394,78.06,78.06,14.0,147.0,588,0.0700500357
+914,1865,914,8394,56.57,56.57,0.0,298.0,2737,0.3260662378

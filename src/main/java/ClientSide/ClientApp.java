@@ -27,6 +27,10 @@ public class ClientApp {
     public void assignHomeserver(int plus_connection, int plus_used){
         service.getHomeServerId(this, plus_connection, plus_used);
     }
+    
+    public void updateState(int newHomeId){
+        service.updateState(this, newHomeId);
+    }
 
     public void initializeLocation(double locationX, double locationY){
         this.location.setX(locationX);
