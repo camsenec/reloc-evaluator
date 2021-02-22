@@ -16,7 +16,7 @@ public interface EdgeServerAPI {
                                      @Part("capacity") RequestBody capacity);
 
     @Multipart
-    @PUT("api/v1/manager/server/update_used/")
+    @PUT("api/v1/manager/server/update_state/")
     Call<EdgeServerModel> updateServerStatus(@Query("application_id") int application_id,
                                              @Query("server_id") int server_id,
                                              @Part("used") RequestBody used,

@@ -2,21 +2,23 @@ package Model;
 
 public class EdgeServerModel {
     private int application_id;
-    private int serverId;
+    private int server_id;
     private float x;
     private float y;
     private float capacity;
     private float used;
-    private int clusterId;
+    private int connection;
+    private int cluster_id;
 
-    public EdgeServerModel(int application_id, int serverId, float x, float y, float capacity, float used, int cluster_id) {
+    public EdgeServerModel(int application_id, int server_id, float x, float y, float capacity, float used, int connection, int cluster_id) {
         this.application_id = application_id;
-        this.serverId = serverId;
+        this.server_id = server_id;
         this.x = x;
         this.y = y;
         this.capacity = capacity;
         this.used = used;
-        this.clusterId = cluster_id;
+        this.connection = connection;
+        this.cluster_id = cluster_id;
     }
 
     public int getApplication_id() {
@@ -27,12 +29,12 @@ public class EdgeServerModel {
         this.application_id = application_id;
     }
 
-    public int getServerId() {
-        return serverId;
+    public int getServer_id() {
+        return server_id;
     }
 
-    public void setServerId(int server_id) {
-        this.serverId = server_id;
+    public void setServer_id(int server_id) {
+        this.server_id = server_id;
     }
 
     public float getX() {
@@ -67,24 +69,36 @@ public class EdgeServerModel {
         this.used = used;
     }
 
+    
+
     public int getCluster_id() {
-        return clusterId;
+        return cluster_id;
     }
 
     public void setCluster_id(int cluster_id) {
-        this.clusterId = cluster_id;
+        this.cluster_id = cluster_id;
     }
 
     @Override
     public String toString() {
         return "EdgeServerModel{" +
                 "application_id=" + application_id +
-                ", server_id=" + serverId +
+                ", server_id=" + server_id +
                 ", x=" + x +
                 ", y=" + y +
                 ", capacity=" + capacity +
                 ", used=" + used +
-                ", cluster_id=" + clusterId +
+                ", connection=" + connection + 
+                ", cluster_id=" + cluster_id +
                 '}';
     }
+
+    public int getConnection() {
+        return connection;
+    }
+
+    public void setConnection(int connection) {
+        this.connection = connection;
+    }
+
 }

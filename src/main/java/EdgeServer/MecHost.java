@@ -10,8 +10,8 @@ import java.util.Random;
 import MP.MessageProcessor;
 
 public class MecHost {
-    private int applicationId;
-    private int serverId;
+    private int application_id;
+    private int server_id;
     private Point2D location = new Point2D();
     private int used;
     private int capacity;
@@ -24,7 +24,7 @@ public class MecHost {
      * Default Constructor
      */
     public MecHost(int applicationId){
-        this.applicationId = applicationId;
+        this.application_id = applicationId;
     }
 
     public void initialize(int capacity){
@@ -59,24 +59,24 @@ public class MecHost {
 
     public void resetState(){
         this.used = 0;
-        this.capacity = 0;
+        this.connection = 0;
         service.updateState(this);
     }
 
     public int getApplicationId() {
-        return applicationId;
+        return application_id;
     }
 
-    public void setApplicationId(int applicationId) {
-        this.applicationId = applicationId;
+    public void setApplicationId(int application_id) {
+        this.application_id = application_id;
     }
 
     public int getServerId() {
-        return serverId;
+        return server_id;
     }
 
-    public void setServerId(int serverId) {
-        this.serverId = serverId;
+    public void setServerId(int server_id) {
+        this.server_id = server_id;
     }
 
     public int getUsed() {
@@ -124,8 +124,8 @@ public class MecHost {
     @Override
     public String toString() {
         return "MecHost{" +
-                "applicationId=" + applicationId +
-                ", serverId=" + serverId +
+                "applicationId=" + application_id +
+                ", serverId=" + server_id +
                 ", location=" + location +
                 ", used=" + used +
                 ", capacity=" + capacity +
