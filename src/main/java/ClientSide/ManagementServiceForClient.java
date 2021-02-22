@@ -40,7 +40,7 @@ public class ManagementServiceForClient {
    
     /**
      * API Call
-     * @param client クライアントのインスタンス
+     * @param client Instance of ClientApp
      */
     public void registerToServer(ClientApp client){
 
@@ -63,6 +63,7 @@ public class ManagementServiceForClient {
 
         try {
             Response<ClientModel> response = call.execute();
+            //System.out.println(response.body());
             client.setHomeServerId(response.body().getHome());
             System.out.println("Client " + client.getClientId() + " registered");
         }catch(EOFException e){
@@ -109,9 +110,17 @@ public class ManagementServiceForClient {
 
     public void getHomeServerId(ClientApp client){
 
+        RequestBody plus_connection_body = RequestBody.create(MediaType.parse("multipart/form-data"),
+                String.valueOf(1));
+
+        RequestBody plus_used_body = RequestBody.create(MediaType.parse("multipart/form-data"),
+                String.valueOf(0));
+
         Call<ClientModel> call = service.updateHomeOfClient(
                 client.getApplicationId(),
-                client.getClientId());
+                client.getClientId(),
+                plus_connection_body,
+                plus_used_body);
 
         try {
             Response<ClientModel> response = call.execute();
@@ -124,6 +133,53 @@ public class ManagementServiceForClient {
             e.printStackTrace();
         }
 
+    }
+
+    public void getHomeServerId(ClientApp client, int plus_connection, int plus_used){
+        RequestBody plus_connection_body = RequestBody.create(MediaType.parse("multipart/form-data"),
+                String.valueOf(plus_connection));
+
+        RequestBody plus_used_body = RequestBody.create(MediaType.parse("multipart/form-data"),
+                String.valueOf(plus_used));
+
+        Call<ClientModel> call = service.updateHomeOfClient(
+                client.getApplicationId(),
+                client.getClientId(),
+                plus_connection_body,
+                plus_used_body);
+
+        try {
+            Response<ClientModel> response = call.execute();
+            client.setHomeServerId(response.body().getHome());
+            System.out.println("Response: " + response.body());
+            System.out.println("Client " + client.getClientId() + " 's Home was obtained");
+        }catch(EOFException e){
+            e.printStackTrace();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+
+    }
+
+    public void updateState(ClientApp client, int newHomeId){
+        RequestBody newHomeIdBody = RequestBody.create(MediaType.parse("multipart/form-data"),
+                String.valueOf(newHomeId));
+
+      Call<ClientModel> call = service.updateState(
+                client.getApplicationId(),
+                client.getClientId(),
+                newHomeIdBody);
+
+        try {
+            Response<ClientModel> response = call.execute();
+            client.setHomeServerId(response.body().getHome());
+        }catch(EOFException e){
+            e.printStackTrace();
+        }catch(IOException e){
+            e.printStackTrace();
+        }  
+
+       
     }
 
 

@@ -8,9 +8,9 @@ public class ClientModel {
     private float y;
     private int home;
 
-    public ClientModel(int application_id, int clientId, float x, float y, int home) {
+    public ClientModel(int application_id, int client_id, float x, float y, int home) {
         this.application_id = application_id;
-        this.client_id = clientId;
+        this.client_id = client_id;
         this.x = x;
         this.y = y;
         this.home = home;
@@ -24,12 +24,12 @@ public class ClientModel {
         this.application_id = applicationId;
     }
 
-    public int getClientId() {
+    public int getClient_id() {
         return client_id;
     }
 
-    public void setClientId(int clientId) {
-        this.client_id = clientId;
+    public void setClient_id(int client_id) {
+        this.client_id = client_id;
     }
 
     public float getX() {

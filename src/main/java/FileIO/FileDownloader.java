@@ -1,6 +1,5 @@
 package FileIO;
 
-import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -9,11 +8,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
-import java.net.URL;
 
 public class FileDownloader {
 
@@ -45,8 +41,8 @@ public class FileDownloader {
             // Output Stream
             DataOutputStream dataOutStream
                     = new DataOutputStream(
-                    new BufferedOutputStream(
-                            new FileOutputStream("./Log/txLog.csv")));
+                        new BufferedOutputStream(
+                            new FileOutputStream("./Log/tx_log.csv")));
 
             // Read Data
             byte[] b = new byte[4096];

@@ -16,11 +16,11 @@ public interface EdgeServerAPI {
                                      @Part("capacity") RequestBody capacity);
 
     @Multipart
-    @PUT("api/v1/manager/server/update_used/")
+    @PUT("api/v1/manager/server/update_state/")
     Call<EdgeServerModel> updateServerStatus(@Query("application_id") int application_id,
                                              @Query("server_id") int server_id,
-                                             @Part("capacity") RequestBody capacity,
-                                             @Part("used") RequestBody used);
+                                             @Part("used") RequestBody used,
+                                             @Part("connection") RequestBody connection);
 
 
 
@@ -47,7 +47,16 @@ public interface EdgeServerAPI {
     @Multipart
     @PUT("api/v1/manager/user/update_home/")
     Call<ClientModel> updateHomeOfClient(@Query("application_id") int application_id,
-                                         @Query("client_id") int client_id);
+                                         @Query("client_id") int client_id,
+                                         @Part("plus_connection") RequestBody plus_connection,
+                                         @Part("plus_used") RequestBody plus_used);
+
+    @Multipart
+    @PUT("api/v1/manager/user/update_state/")
+    Call<ClientModel> updateState(@Query("application_id") int application_id,
+                                  @Query("client_id") int client_id,
+                                  @Part("home") RequestBody newHomeId);
+    
 
     @Multipart
     @PUT("api/v1/manager/area/update_number_of_coopserver/")

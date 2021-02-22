@@ -48,9 +48,9 @@ public class FileFactory {
 
         if(DEBUG) {
             for (Integer key : TxLog.txLog.keySet()) {
-                ArrayList tmp = TxLog.txLog.get(key);
+                ArrayList<Integer> tmp = TxLog.txLog.get(key);
                 System.out.print(key + ":");
-                for (Object sendto : tmp) {
+                for (int sendto : tmp) {
                     System.out.print(sendto);
                     System.out.print(" ");
 
@@ -147,7 +147,6 @@ public class FileFactory {
     public static void saveClientState(){
         try {
 
-            // 出力ファイルの作成
             FileWriter f = new FileWriter("./Cache/clientCache.csv", false);
             PrintWriter p = new PrintWriter(new BufferedWriter(f));
             for(int clientId : ManagementServiceForClient.clientMap.keySet()){

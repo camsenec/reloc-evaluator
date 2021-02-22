@@ -37,11 +37,10 @@ public class ManagementServiceForServer {
 
     /**
      * API Call
-     * @param host MECHostのインスタンス
+     * @param host Instance of MecHost
      */
     public void registerToServer(MecHost host){
 
-        /*------create request body------*/
 
         RequestBody x = RequestBody.create(MediaType.parse("multipart/form-data"),
                 String.valueOf(host.getLocation().getX()));
@@ -61,6 +60,7 @@ public class ManagementServiceForServer {
 
         try {
             Response<EdgeServerModel> response = call.execute();
+            System.out.println(response.body());
             host.setServerId(response.body().getServer_id());
             System.out.println("Server " + host.getServerId() + " was registered");
         }catch(IOException e){
@@ -71,19 +71,18 @@ public class ManagementServiceForServer {
 
     public void updateState(MecHost server){
 
-        RequestBody capacity = RequestBody.create(MediaType.parse("multipart/form-data"),
-                String.valueOf(server.getCapacity()));
-
         RequestBody used = RequestBody.create(MediaType.parse("multipart/form-data"),
                 String.valueOf(server.getUsed()));
+        
+        RequestBody connection = RequestBody.create(MediaType.parse("multipart/form-data"),
+                String.valueOf(server.getConnection()));
 
-        /*------create call------*/
 
         Call<EdgeServerModel> call = service.updateServerStatus(
                 server.getApplicationId(),
                 server.getServerId(),
-                capacity,
-                used);
+                used,
+                connection);
 
         try {
             call.execute();
