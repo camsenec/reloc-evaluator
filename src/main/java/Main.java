@@ -36,8 +36,8 @@ public class Main {
         /* read command line argument */
         
         Result.reset();
-        Constants.first();
-        //Constants.notFirst();
+        //Constants.first();
+        Constants.notFirst();
         service.updateNumberOfCoopServer(10);
 
         if (Constants.UPLOAD) {
@@ -191,7 +191,8 @@ public class Main {
                                 System.out.format("Document %d has already been stored!\n", documentId);
                             }
 
-                            if(server.getUsed() >= Config.capacityOfServers * 0.8){
+                            if(server.getUsed() >= Config.capacityOfServers * 0.8
+                                || server.getConnection() >= Config.connectionLimit * 0.8){
                                 MessageProcessor movedMP = server.getMPmap().get(senderId);
                                 MecHost preHome = ManagementServiceForServer.serverMap.get(receiver.getHomeServerId());
                                 receiver.assignHomeserver(movedMP.getClientMap().size(), movedMP.getDocMap().size());
@@ -223,7 +224,7 @@ public class Main {
         if (Constants.TEST) {
             //Constants
             int A = Config.capacityOfServers;
-            int B = 100;
+            int B = Config.connectionLimit;
             int dc = 5;
             int L = Config.numberOfServers;
             int N = txLog.size();
@@ -378,6 +379,7 @@ public class Main {
 
             FileFactory.saveResult();
             FileFactory.saveMetric();
+            FileFactory.saveServerResult();
         }
     }
 }
