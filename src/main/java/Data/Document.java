@@ -1,7 +1,5 @@
 package Data;
 
-import Config.Config;
-
 
 public class Document {
     /** METADATA **/

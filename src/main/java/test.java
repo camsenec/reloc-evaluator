@@ -1,17 +1,14 @@
 import java.util.HashMap;
+import java.util.Random;
 
 
 public class test {
 
     public static void main(String[] args) {
-        HashMap<Integer, Integer> a = new HashMap<>();
-        a.put(1,1);
-        a.put(2,2);
-        a.put(3,3);
-        System.out.println(a.size());
-        a.remove(1);
-        System.out.println(a.size());
-        
+       Random random = new Random(1);
+       for(int i = 0; i < 10; i++){
+           System.out.println(random.nextDouble());
+       }
     }
 
         /*

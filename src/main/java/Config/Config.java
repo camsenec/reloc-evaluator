@@ -7,5 +7,5 @@ public class Config {
     public static int numberOfDocsPerClients = 1;
     public static int sizeOfDocs = 1;
     public static int connectionLimit = 100;
-    public static int locality = 2;
+    public static int locality = 5;
 }

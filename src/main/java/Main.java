@@ -25,7 +25,8 @@ import static Logger.TxLog.txLogDocs;
 public class Main {
 
     public static void main(String args[]) throws InterruptedException {
-        boolean RLCCA = true;
+        boolean RLCCA = false;
+        boolean FIG = false;
 
         ManagementServiceForClient service = new ManagementServiceForClient();
 
@@ -36,22 +37,24 @@ public class Main {
         /* read command line argument */
         
         Result.reset();
-        //Constants.first();
-        Constants.notFirst();
+        Constants.first();
+        //Constants.notFirst();
         service.updateNumberOfCoopServer(10);
 
         if (Constants.UPLOAD) {
             /* Step 1 : Register server to a management server */
             for (int i = 0; i < Config.numberOfServers; i++) {
                 MecHost host = new MecHost(Config.application_id);
-                host.initialize(Config.capacityOfServers); //why is it 0?
+                host.initialize(Config.capacityOfServers);
                 ManagementServiceForServer.serverMap.put(host.getServerId(), host);
             }
 
 
             /* Step 2 : Register client to a management server*/
             ClientApp client;
-            Random random = new Random();
+            Random random;
+            if(FIG) random = new Random(1);
+            else random = new Random();
 
             for (int senderId : txLog.keySet()) {
                 client = new ClientApp(Config.application_id, senderId);
