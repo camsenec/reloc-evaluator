@@ -45,7 +45,7 @@ public class Main {
             /* Step 1 : Register server to a management server */
             for (int i = 0; i < Config.numberOfServers; i++) {
                 MecHost host = new MecHost(Config.application_id);
-                host.initialize(Config.capacityOfServers);
+                host.initialize(Config.capacityOfServers, i);
                 ManagementServiceForServer.serverMap.put(host.getServerId(), host);
             }
 

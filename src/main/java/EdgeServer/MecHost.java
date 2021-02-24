@@ -7,6 +7,8 @@ import Field.Point2D;
 
 import java.util.HashMap;
 import java.util.Random;
+
+import Config.Config;
 import MP.MessageProcessor;
 
 public class MecHost {
@@ -34,8 +36,16 @@ public class MecHost {
         this.connection = 0;
         initializeLocation();
         service.registerToServer(this);
-
     }
+
+    public void initialize(int capacity, int id){
+        this.capacity = capacity;
+        this.used = 0;
+        this.connection = 0;
+        initializeLocation(id);
+        service.registerToServer(this);
+    }
+
 
     private void initializeLocation(){
         double areaLengthX = Constants.MAX_X - Constants.MIN_X;
@@ -44,6 +54,16 @@ public class MecHost {
         Random random = new Random();
         double locationX = Constants.MIN_X + random.nextDouble() * areaLengthX;
         double locationY = Constants.MIN_Y + random.nextDouble() * areaLengthY;
+        this.location.setX(locationX);
+        this.location.setY(locationY);
+    }
+    
+    private void initializeLocation(int id){
+        assert(Config.numberOfServers == 100);
+        int j = (int)(id / 10);
+        int i = id % 10;
+        double locationX = 5 + 10 * i;
+        double locationY = 5 + 10 * j;
         this.location.setX(locationX);
         this.location.setY(locationY);
     }
