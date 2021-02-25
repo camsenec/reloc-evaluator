@@ -281,7 +281,7 @@ public class Main {
             for (double a : aMap.values()) {
                 sum += a;
             }
-            Metric.MET_1 = sum / L;
+            Metric.MET_1 = alpha * sum / L;
 
             //2. Y_2
             HashMap<Integer, Double> bMap = new HashMap<>();
@@ -294,6 +294,12 @@ public class Main {
                 }
             }
             sum = 0;
+            for (double b : bMap.values()){
+                sum += b;
+            }
+            Metric.MET_2 = beta * sum / L;
+            /*
+            sum = 0;
             for (MecHost server : ManagementServiceForServer.serverMap.values()) {
                 sum += server.getConnection();
             }
@@ -304,7 +310,7 @@ public class Main {
                 sum += (server.getConnection() - ave) * (server.getConnection() - ave);
             }
             Metric.MET_2 = Math.sqrt((double) sum / (L - 1));
-
+            */
             //3.Y_3
             HashMap<Integer, Double> distanceMap = new HashMap<>();
             for (int serverId : homeClientsMap.keySet()) {
@@ -325,7 +331,7 @@ public class Main {
             for (int serverId : distanceMap.keySet()) {
                 sum += distanceMap.get(serverId);
             }
-            Metric.MET_3 = sum / M;
+            Metric.MET_3 = gamma * sum / M;
 
 
             //4.Y
@@ -333,33 +339,43 @@ public class Main {
             double di = 0;
             for(Tuple<Integer, Integer> key: txLog.keySet()){
                 int senderId = key.second;
+
+                //publisher side
                 ClientApp sender = ManagementServiceForClient.clientMap.get(senderId);
                 int senderHomeId = sender.getHomeServerId();
                 MecHost senderHome = ManagementServiceForServer.serverMap.get(senderHomeId);
                 double x_dist = Math.abs(sender.getLocation().getX() - senderHome.getLocation().getX());
                 double y_dist = Math.abs(sender.getLocation().getY() - senderHome.getLocation().getY());
                 
-                double dl1h = beta * Math.max(homeClientsMap.get(senderHomeId).size() - B, 0);
-                double dl2h = gamma * Math.sqrt(x_dist * x_dist + y_dist * y_dist);
-                double dlh = dl1h + dl2h;
-                double dmp = dlh + rMap.get(senderHomeId) * dc;
+                double dl1 = alpha * aMap.get(senderHomeId);
+                double dl2 = beta * bMap.get(senderHomeId);
+                double dl3 = gamma * Math.sqrt(x_dist * x_dist + y_dist * y_dist);
+                double dmp = dl1 + dl2 + dl3;
                 
                 ArrayList<Integer> receivers = txLog.get(key); 
                 double dms_sum = 0;
+                double dmmid_sum = 0;
                 for(int receiverId: receivers){
                     ClientApp receiver = ManagementServiceForClient.clientMap.get(receiverId);
                     int receiverHomeId = receiver.getHomeServerId();
                     MecHost receiverHome = ManagementServiceForServer.serverMap.get(receiverHomeId);
+                    x_dist = Math.abs(senderHome.getLocation().getX() - receiverHome.getLocation().getX());
+                    y_dist = Math.abs(senderHome.getLocation().getY() - receiverHome.getLocation().getY());
+                    dmmid_sum += gamma_2 * Math.sqrt(x_dist * x_dist + y_dist * y_dist);
+
+
+                    //subscriber side
                     x_dist = Math.abs(receiver.getLocation().getX() - receiverHome.getLocation().getX());
                     y_dist = Math.abs(receiver.getLocation().getY() - receiverHome.getLocation().getY());
                 
-                    dl1h = beta * Math.max(homeClientsMap.get(receiverHomeId).size() - B, 0);
-                    dl2h = gamma * Math.sqrt(x_dist * x_dist + y_dist * y_dist);
-                    dlh = dl1h + dl2h;
-                    dms_sum += dlh + rMap.get(receiverHomeId) * dc;
+                    dl1 = alpha * aMap.get(receiverHomeId);
+                    dl2 = beta * bMap.get(receiverHomeId);
+                    dl3 = gamma * Math.sqrt(x_dist * x_dist + y_dist * y_dist);
+                    dms_sum += dl1 + dl2 + dl3;
                 }
+                double dmmid = dmmid_sum / receivers.size();
                 double dms = dms_sum / receivers.size();
-                di += (dmp + dms);
+                di += (dmp + dmmid + dms);
             }
             Metric.MET_4 = di / N;
         }
