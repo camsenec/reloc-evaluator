@@ -68,7 +68,7 @@ public class MecHost {
         this.location.setY(locationY);
     }
 
-    public void addUsed(int sizeOfDoc){
+    public void addUsed(double sizeOfDoc){
         this.used += sizeOfDoc;
         service.updateState(this);
     }

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 import Result.Result;
+import Utility.Tuple;
 import Config.Config;
 import Result.Metric;
 
@@ -56,7 +57,8 @@ public class Main {
             if(FIG) random = new Random(1);
             else random = new Random();
 
-            for (int senderId : txLog.keySet()) {
+            for (Tuple<Integer, Integer> key : txLog.keySet()) {
+                int senderId = key.second;
                 client = new ClientApp(Config.application_id, senderId);
                 ClientApp isExist = ManagementServiceForClient.clientMap.putIfAbsent(client.getClientId(), client);
                 if(isExist==null){
@@ -66,7 +68,7 @@ public class Main {
                     ManagementServiceForServer.serverMap.get(client.getHomeServerId()).addConnection(1);
                 }
 
-                ArrayList<Integer> receivers = txLog.get(senderId);
+                ArrayList<Integer> receivers = txLog.get(key);
                 Point2D baseLocation = client.getLocation();
                 for (int receiverId : receivers) {
                     client = new ClientApp(Config.application_id, receiverId);
@@ -108,7 +110,8 @@ public class Main {
 
         /*Step 3 : Prepare Document */
         int id = 1;
-        for (int senderId : txLog.keySet()) {
+        for (Tuple<Integer, Integer> key : txLog.keySet()) {
+            int senderId = key.second;
             ArrayList<Integer> docList = new ArrayList<>();
             for (int i = 0; i < Config.numberOfDocsPerClients; i++) {
                 Document document = new Document(Config.application_id, id);
@@ -234,7 +237,7 @@ public class Main {
             int M = ManagementServiceForClient.clientMap.size();
             double beta = 1;
             double gamma = 0.1;
-            double gamma_2 = 0.001;
+            double gamma_2 = 0.01;
 
             HashMap<Integer, ArrayList<Integer>> homeClientsMap = new HashMap<>();
             for (Integer serverId : ManagementServiceForServer.serverMap.keySet()) {
