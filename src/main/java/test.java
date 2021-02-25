@@ -1,14 +1,19 @@
 import java.util.HashMap;
 import java.util.Random;
 
+import Utility.Tuple;
+
 
 public class test {
 
     public static void main(String[] args) {
-       Random random = new Random(1);
-       for(int i = 0; i < 10; i++){
-           System.out.println(random.nextDouble());
-       }
+       HashMap<Tuple<Integer, Integer>, Integer> a = new HashMap<>();
+       a.put(new Tuple<Integer,Integer>(1,2), 1);
+       a.put(new Tuple<Integer,Integer>(2,1), 1);
+       a.put(new Tuple<Integer,Integer>(3,2), 1);
+       a.put(new Tuple<Integer,Integer>(2,3), 1);
+       System.out.println(a);
+
     }
 
         /*

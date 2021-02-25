@@ -27,6 +27,7 @@ public class Main {
 
     public static void main(String args[]) throws InterruptedException {
         boolean RLCCA = false;
+        boolean LCCA = false;
         boolean FIG = false;
 
         ManagementServiceForClient service = new ManagementServiceForClient();
@@ -119,17 +120,20 @@ public class Main {
                 DataBase.dataBase.put(id, document);
                 docList.add(id++);
             }
-            txLogDocs.put(senderId, docList);
+            txLogDocs.put(key, docList);
         }
+        System.out.println(--id + "Documents are registered");
 
         if (Constants.SIMULATION) {
-            for (int senderId : txLog.keySet()) {
-                ArrayList<Integer> publishedDocuments = txLogDocs.get(senderId);
+            for (Tuple<Integer, Integer> key : txLog.keySet()) {
+                int repId = key.first;
+                int senderId = key.second;
+                ArrayList<Integer> publishedDocuments = txLogDocs.get(key);
 
                 for (int documentId : publishedDocuments) {
                     Document document = DataBase.dataBase.get(documentId);
                     
-                    if(!RLCCA){
+                    if(!RLCCA && !LCCA){
                         int homeId = ManagementServiceForClient.clientMap.get(senderId).getHomeServerId();
                         MecHost server = ManagementServiceForServer.serverMap.get(homeId);
                         Document isExist = server.getCollection().putIfAbsent(document.getDocumentId(), document);
@@ -138,7 +142,7 @@ public class Main {
                         //If a new document is published, update the server state
                         server.addUsed(document.getSize());
 
-                        List<Integer> receivers = txLog.get(senderId);
+                        List<Integer> receivers = txLog.get(key);
                         for (int receiverId : receivers) {
                             /* get home server of a receiver*/
                             homeId = ManagementServiceForClient.clientMap.get(receiverId).getHomeServerId();
@@ -157,6 +161,7 @@ public class Main {
                     }else{
                         int homeId = ManagementServiceForClient.clientMap.get(senderId).getHomeServerId();
                         MecHost server = ManagementServiceForServer.serverMap.get(homeId);
+                        //new document
                         Document isDocExist = server.getCollection().putIfAbsent(document.getDocumentId(), document);
                         Result.numberOfCachedDocument++;
 
@@ -164,10 +169,10 @@ public class Main {
                         server.addUsed(document.getSize());
                         MessageProcessor mp = new MessageProcessor();
                         mp.getDocMap().putIfAbsent(documentId, document);
-                        mp.getClientMap().putIfAbsent(senderId, ManagementServiceForClient.clientMap.get(senderId));
-                        server.getMPmap().putIfAbsent(senderId, mp);
+                        mp.getClientMap().putIfAbsent(repId, ManagementServiceForClient.clientMap.get(senderId));
+                        server.getMPmap().putIfAbsent(repId, mp);
                     
-                        List<Integer> receivers = txLog.get(senderId);
+                        List<Integer> receivers = txLog.get(key);
                         for (int receiverId : receivers) {
                             /* get home server of a receiver*/
                             ClientApp receiver = ManagementServiceForClient.clientMap.get(receiverId);
@@ -176,7 +181,7 @@ public class Main {
                             isDocExist = server.getCollection().putIfAbsent(document.getDocumentId(), document);
                             Result.numberOfCachedDocument++;
 
-                            boolean isMPExist = server.getMPmap().containsKey(senderId);
+                            boolean isMPExist = server.getMPmap().containsKey(repId);
                             //If a new document is published, update the server state
                             // even if null, the doc was put to the database
                             //System.out.println("EXIST: " + isMPExist);
@@ -186,20 +191,20 @@ public class Main {
                                 mp = new MessageProcessor();
                                 mp.getDocMap().put(documentId, document);
                                 mp.getClientMap().putIfAbsent(receiverId, ManagementServiceForClient.clientMap.get(receiverId));
-                                server.getMPmap().putIfAbsent(senderId, mp);
+                                server.getMPmap().putIfAbsent(repId, mp);
                             } else if(isDocExist == null && isMPExist) {
                                 server.addUsed(document.getSize());
                                 mp.getDocMap().put(documentId, document);
                                 mp.getClientMap().putIfAbsent(receiverId, ManagementServiceForClient.clientMap.get(receiverId));
-                                server.getMPmap().putIfAbsent(senderId, mp);
+                                server.getMPmap().putIfAbsent(repId, mp);
                             } else {
                                 Result.saved++;
                                 System.out.format("Document %d has already been stored!\n", documentId);
                             }
 
-                            if(server.getUsed() >= Config.capacityOfServers * 0.8
-                                || server.getConnection() >= Config.connectionLimit * 0.8){
-                                MessageProcessor movedMP = server.getMPmap().get(senderId);
+                            if(server.getUsed() >= Config.capacityOfServers
+                                || server.getConnection() >= Config.connectionLimit){
+                                MessageProcessor movedMP = server.getMPmap().get(repId);
                                 MecHost preHome = ManagementServiceForServer.serverMap.get(receiver.getHomeServerId());
                                 receiver.assignHomeserver(movedMP.getClientMap().size(), movedMP.getDocMap().size());
                                 HashMap<Integer, ClientApp> clients = movedMP.getClientMap();
@@ -208,13 +213,15 @@ public class Main {
                                 }
                                 MecHost newHome =  ManagementServiceForServer.serverMap.get(receiver.getHomeServerId());
                                 System.out.println("HOME UPDATED");
-                                newHome.getMPmap().put(senderId, movedMP);
-                                newHome.addUsed(Config.sizeOfDocs * movedMP.getDocMap().size());
-                                newHome.addConnection(movedMP.getClientMap().size());
-                                for(int i: movedMP.getDocMap().keySet()){
-                                  newHome.getCollection().putIfAbsent(i, movedMP.getDocMap().get(i));
+                                MessageProcessor isMP = newHome.getMPmap().putIfAbsent(repId, movedMP);
+                                if(isMP == null){
+                                  newHome.addUsed(Config.sizeOfDocs * movedMP.getDocMap().size());
+                                  newHome.addConnection(movedMP.getClientMap().size());
+                                  for(int i: movedMP.getDocMap().keySet()){
+                                    newHome.getCollection().putIfAbsent(i, movedMP.getDocMap().get(i));
+                                  }
                                 }
-                                preHome.getMPmap().remove(senderId);
+                                preHome.getMPmap().remove(repId);
                                 preHome.addUsed(-Config.sizeOfDocs * movedMP.getDocMap().size());
                                 preHome.addConnection(-movedMP.getClientMap().size());
                                 for(int i: movedMP.getDocMap().keySet()){
@@ -231,11 +238,11 @@ public class Main {
             //Constants
             int A = Config.capacityOfServers;
             int B = Config.connectionLimit;
-            int dc = 5;
+            int alpha = 12800 / 750;
             int L = Config.numberOfServers;
             int N = txLog.size();
             int M = ManagementServiceForClient.clientMap.size();
-            double beta = 1;
+            double beta = 5;
             double gamma = 0.1;
             double gamma_2 = 0.01;
 
@@ -260,23 +267,32 @@ public class Main {
             }
 
             //1. Y_1
-            HashMap<Integer, Double> rMap = new HashMap<>();
+            HashMap<Integer, Double> aMap = new HashMap<>();
             for (Integer serverId : homeClientsMap.keySet()) {
                 MecHost s_l = ManagementServiceForServer.serverMap.get(serverId);
                 if (A >= s_l.getUsed()) {
-                    rMap.put(serverId, 0.0);
+                    aMap.put(serverId, 0.0);
                 } else {
-                    rMap.put(serverId, 1 - (A / (double) s_l.getUsed()));
+                    aMap.put(serverId, 1 - (A / (double) s_l.getUsed()));
                 }
             }
 
             double sum = 0;
-            for (double r : rMap.values()) {
-                sum += r;
+            for (double a : aMap.values()) {
+                sum += a;
             }
             Metric.MET_1 = sum / L;
 
             //2. Y_2
+            HashMap<Integer, Double> bMap = new HashMap<>();
+            for (Integer serverId : homeClientsMap.keySet()) {
+                MecHost s_l = ManagementServiceForServer.serverMap.get(serverId);
+                if (B >= s_l.getUsed()) {
+                    bMap.put(serverId, 0.0);
+                } else {
+                    bMap.put(serverId, 1 - (B / (double) s_l.getConnection()));
+                }
+            }
             sum = 0;
             for (MecHost server : ManagementServiceForServer.serverMap.values()) {
                 sum += server.getConnection();
@@ -315,7 +331,8 @@ public class Main {
             //4.Y
             //The same data flow with the data flow in txLog
             double di = 0;
-            for(int senderId: txLog.keySet()){
+            for(Tuple<Integer, Integer> key: txLog.keySet()){
+                int senderId = key.second;
                 ClientApp sender = ManagementServiceForClient.clientMap.get(senderId);
                 int senderHomeId = sender.getHomeServerId();
                 MecHost senderHome = ManagementServiceForServer.serverMap.get(senderHomeId);
@@ -327,7 +344,7 @@ public class Main {
                 double dlh = dl1h + dl2h;
                 double dmp = dlh + rMap.get(senderHomeId) * dc;
                 
-                ArrayList<Integer> receivers = txLog.get(senderId); 
+                ArrayList<Integer> receivers = txLog.get(key); 
                 double dms_sum = 0;
                 for(int receiverId: receivers){
                     ClientApp receiver = ManagementServiceForClient.clientMap.get(receiverId);
