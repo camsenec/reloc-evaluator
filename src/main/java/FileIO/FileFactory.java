@@ -242,7 +242,7 @@ public class FileFactory {
                 p.print(",");
                 p.print(server.getConnection());
                 p.print(",");
-                p.print(server.getUsed());
+                p.printf("%.4f",server.getUsed());
                 p.print(",");
                 p.print(server.getMPmap().size());
                 p.print(",");

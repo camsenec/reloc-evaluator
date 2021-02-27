@@ -63,7 +63,7 @@ public class ManagementServiceForClient {
 
         try {
             Response<ClientModel> response = call.execute();
-            //System.out.println(response.body());
+            System.out.println(response.body());
             client.setHomeServerId(response.body().getHome());
             System.out.println("Client " + client.getClientId() + " registered");
         }catch(EOFException e){

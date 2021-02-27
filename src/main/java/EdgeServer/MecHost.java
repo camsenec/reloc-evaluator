@@ -15,7 +15,7 @@ public class MecHost {
     private int application_id;
     private int server_id;
     private Point2D location = new Point2D();
-    private int used;
+    private double used;
     private int capacity;
     private int connection;
     private HashMap<Integer, Document> collection = new HashMap<>();
@@ -59,11 +59,11 @@ public class MecHost {
     }
     
     private void initializeLocation(int id){
-        assert(Config.numberOfServers == 100);
-        int j = (int)(id / 10);
-        int i = id % 10;
-        double locationX = 5 + 10 * i;
-        double locationY = 5 + 10 * j;
+        assert(Config.numberOfServers == 25);
+        int j = (int)(id / 4);
+        int i = id % 4;
+        double locationX = 5 + 5 * i;
+        double locationY = 5 + 5 * j;
         this.location.setX(locationX);
         this.location.setY(locationY);
     }
@@ -100,11 +100,11 @@ public class MecHost {
         this.server_id = server_id;
     }
 
-    public int getUsed() {
+    public double getUsed() {
         return used;
     }
 
-    public void setUsed(int used) {
+    public void setUsed(double used) {
         this.used = used;
     }
 
