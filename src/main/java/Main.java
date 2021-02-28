@@ -186,58 +186,64 @@ public class Main {
                             Result.saved++;
                             System.out.format("Document %d has already been stored!\n", documentId);
                             mp = senderHome.getMPmap().get(repId);
-                            //mp.getDocMap().putIfAbsent(documentId, document);
-                            //mp.getClientMap().putIfAbsent(senderId, sender);
+                            mp.getDocMap().putIfAbsent(documentId, document);
+                            mp.getClientMap().putIfAbsent(senderId, sender);
                             sender.getMPmap().putIfAbsent(repId, mp);
                         }
                         //add mp to client
-                        
-
                         if(senderHome.getUsed() >= Config.capacityOfServers
                             || senderHome.getConnection() >= Config.connectionLimit){
                             System.out.println("Home Updated");
-                            MecHost preHome = ManagementServiceForServer.serverMap.get(sender.getHomeServerId());
-                            MessageProcessor movedMP = senderHome.getMPmap().get(repId);
+                            MecHost preHome = senderHome;
                             HashMap<Integer, MessageProcessor> copiedMPMap = sender.getMPmap();
                             double copiedSize = 0;
                             for(MessageProcessor copiedMP: copiedMPMap.values()){
                                 copiedSize += copiedMP.getDocMap().size();
                             }
-                            sender.assignHomeserver(movedMP.getClientMap().size(), (movedMP.getDocMap().size() + copiedSize) * Config.sizeOfDocs);
-                            HashMap<Integer, ClientApp> clients = movedMP.getClientMap();
-                            for(ClientApp client : clients.values()){
-                                client.updateState(sender.getHomeServerId());
-                            }
-                            MecHost newHome =  ManagementServiceForServer.serverMap.get(sender.getHomeServerId());
+                            sender.assignHomeserver(1, copiedSize * Config.sizeOfDocs);
+                            MecHost newHome = ManagementServiceForServer.serverMap.get(sender.getHomeServerId());
                             
                             //add movedMp and copiedMP (mp, docs, connection, used) to newHome
-                            newHome.addConnection(movedMP.getClientMap().size());
-                            MessageProcessor isMP = newHome.getMPmap().putIfAbsent(repId, movedMP);
-                            if(isMP == null){
-                                newHome.addUsed(Config.sizeOfDocs * movedMP.getDocMap().size());
-                                for(int i: movedMP.getDocMap().keySet()){
-                                    newHome.getCollection().putIfAbsent(i, movedMP.getDocMap().get(i));
-                                }
-                            }
+                            newHome.addConnection(1);
                             
-                            for(MessageProcessor copiedMP: copiedMPMap.values()){
-                                isMP = newHome.getMPmap().putIfAbsent(repId, copiedMP);
-                                if(isMP == null){
+                            for(int copiedMPId: copiedMPMap.keySet()){
+                                MessageProcessor copiedMP = copiedMPMap.get(copiedMPId);
+                                boolean isMPCP = newHome.getMPmap().containsKey(copiedMPId);
+                                if(!isMPCP){
+                                    MessageProcessor mpcp = new MessageProcessor();
                                     newHome.addUsed(Config.sizeOfDocs * copiedMP.getDocMap().size());
                                     for(int i: copiedMP.getDocMap().keySet()){
                                         newHome.getCollection().putIfAbsent(i, copiedMP.getDocMap().get(i));
                                     }
+                                    mpcp.setDocMap(copiedMP.getDocMap());
+                                    mpcp.getClientMap().put(senderId, sender);
+                                    newHome.getMPmap().put(copiedMPId, mpcp);
+                                }else{
+                                    MessageProcessor mpcp = newHome.getMPmap().get(copiedMPId);
+                                    mpcp.getClientMap().put(senderId, sender);
+                                    newHome.getMPmap().put(copiedMPId,mpcp);
                                 }
                             }
 
-                            //remove movedMP (mp, docs, connection, used) from preHome
-                            preHome.getMPmap().remove(repId);
-                            preHome.addUsed(-Config.sizeOfDocs * movedMP.getDocMap().size());
-                            preHome.addConnection(-movedMP.getClientMap().size());
-                            for(int i: movedMP.getDocMap().keySet()){
-                                preHome.getCollection().remove(i);
+                            for(int copiedMPId: copiedMPMap.keySet()){
+                                MessageProcessor mpcp = preHome.getMPmap().get(copiedMPId);
+                                if(mpcp == null){
+                                    System.out.println("SenderWarning");
+                                    continue; //Why?
+                                }
+                                mpcp.getClientMap().remove(senderId);
+                                if(mpcp.getClientMap().size()==0){
+                                    preHome.addUsed(-Config.sizeOfDocs * mpcp.getDocMap().size());
+                                    preHome.getMPmap().remove(copiedMPId);
+                                    for(int i: mpcp.getDocMap().keySet()){
+                                        preHome.getCollection().remove(i);
+                                    }
+                                }
                             }
-                        }
+                            preHome.addConnection(-1);
+                        }                        
+
+                        
                     
                         List<Integer> receivers = txLog.get(key);
                         for (int receiverId : receivers) {
@@ -270,8 +276,8 @@ public class Main {
                                 Result.saved++;
                                 System.out.format("Document %d has already been stored!\n", documentId);
                                 mp = receiverHome.getMPmap().get(repId);
-                                //mp.getDocMap().putIfAbsent(documentId, document);
-                                //mp.getClientMap().putIfAbsent(receiverId, receiver);
+                                mp.getDocMap().putIfAbsent(documentId, document);
+                                mp.getClientMap().putIfAbsent(receiverId, receiver);
                                 receiver.getMPmap().putIfAbsent(repId, mp);
                             }
                             
@@ -279,47 +285,53 @@ public class Main {
                             if(receiverHome.getUsed() >= Config.capacityOfServers
                                 || receiverHome.getConnection() >= Config.connectionLimit){
                                 System.out.println("Home Updated");
-                                MecHost preHome = ManagementServiceForServer.serverMap.get(receiver.getHomeServerId());
-                                MessageProcessor movedMP = receiverHome.getMPmap().get(repId);
+                                MecHost preHome = receiverHome;
                                 HashMap<Integer, MessageProcessor> copiedMPMap = receiver.getMPmap();
                                 double copiedSize = 0;
                                 for(MessageProcessor copiedMP: copiedMPMap.values()){
                                     copiedSize += copiedMP.getDocMap().size();
                                 }
-                                receiver.assignHomeserver(movedMP.getClientMap().size(), (movedMP.getDocMap().size() + copiedSize) * Config.sizeOfDocs);
-                                HashMap<Integer, ClientApp> clients = movedMP.getClientMap();
-                                for(ClientApp client : clients.values()){
-                                    client.updateState(receiver.getHomeServerId());
-                                }
-                                MecHost newHome =  ManagementServiceForServer.serverMap.get(receiver.getHomeServerId());
+                                receiver.assignHomeserver(1, copiedSize * Config.sizeOfDocs);
+                                MecHost newHome = ManagementServiceForServer.serverMap.get(receiver.getHomeServerId());
                                 
                                 //add movedMp and copiedMP (mp, docs, connection, used) to newHome
-                                newHome.addConnection(movedMP.getClientMap().size());
-                                MessageProcessor isMP = newHome.getMPmap().putIfAbsent(repId, movedMP);
-                                if(isMP == null){
-                                  newHome.addUsed(Config.sizeOfDocs * movedMP.getDocMap().size());
-                                  for(int i: movedMP.getDocMap().keySet()){
-                                    newHome.getCollection().putIfAbsent(i, movedMP.getDocMap().get(i));
-                                  }
-                                }
+                                newHome.addConnection(1);
                                 
-                                for(MessageProcessor copiedMP: copiedMPMap.values()){
-                                    isMP = newHome.getMPmap().putIfAbsent(repId, copiedMP);
-                                    if(isMP == null){
+                                for(int copiedMPId: copiedMPMap.keySet()){
+                                    MessageProcessor copiedMP = copiedMPMap.get(copiedMPId);
+                                    boolean isMPCP = newHome.getMPmap().containsKey(copiedMPId);
+                                    if(!isMPCP){
+                                        MessageProcessor mpcp = new MessageProcessor();
                                         newHome.addUsed(Config.sizeOfDocs * copiedMP.getDocMap().size());
                                         for(int i: copiedMP.getDocMap().keySet()){
                                             newHome.getCollection().putIfAbsent(i, copiedMP.getDocMap().get(i));
                                         }
+                                        mpcp.setDocMap(copiedMP.getDocMap());
+                                        mpcp.getClientMap().put(receiverId, receiver);
+                                        newHome.getMPmap().put(copiedMPId, mpcp);
+                                    }else{
+                                        MessageProcessor mpcp = newHome.getMPmap().get(copiedMPId);
+                                        mpcp.getClientMap().put(receiverId, receiver);
+                                        newHome.getMPmap().put(copiedMPId,mpcp);
                                     }
                                 }
 
-                                //remove movedMP (mp, docs, connection, used) from preHome
-                                preHome.getMPmap().remove(repId);
-                                preHome.addUsed(-Config.sizeOfDocs * movedMP.getDocMap().size());
-                                preHome.addConnection(-movedMP.getClientMap().size());
-                                for(int i: movedMP.getDocMap().keySet()){
-                                    preHome.getCollection().remove(i);
+                                for(int copiedMPId: copiedMPMap.keySet()){
+                                    MessageProcessor mpcp = preHome.getMPmap().get(copiedMPId);
+                                    if(mpcp==null){
+                                        System.out.println("Warning");
+                                        continue; //Why?
+                                    }
+                                    mpcp.getClientMap().remove(receiverId);
+                                    if(mpcp.getClientMap().size()==0){
+                                        preHome.addUsed(-Config.sizeOfDocs * mpcp.getDocMap().size());
+                                        preHome.getMPmap().remove(copiedMPId);
+                                        for(int i: mpcp.getDocMap().keySet()){
+                                           preHome.getCollection().remove(i);
+                                        }
+                                    }
                                 }
+                                preHome.addConnection(-1);
                             }
                         }
                     }
