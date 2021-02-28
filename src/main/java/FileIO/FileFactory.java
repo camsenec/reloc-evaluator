@@ -33,6 +33,12 @@ public class FileFactory {
                 line = line.replace("]\"", "");
                 line = line.replace(" ", "");
                 String[] data = line.split(",", -1);
+                ArrayList<Integer> sendToSec = new ArrayList<>();
+                int client_id = Integer.parseInt(data[1]);
+                for (int i = 2; i < data.length; i++) {
+                    sendToSec.add(Integer.parseInt(data[i]));
+                }
+                TxLog.txLogSec.put(client_id, sendToSec);
 
                 ArrayList<Integer> groupMember = new ArrayList<>();
                 int rep_id = Integer.parseInt(data[1]);
@@ -271,7 +277,7 @@ public class FileFactory {
             p.print(",");
             p.printf("%.4f",Metric.MET_3);
             p.print(",");
-            p.printf("%.4f",Metric.MET_4);
+            p.printf("%f",Metric.MET_4);
 
             p.println();
             p.close();

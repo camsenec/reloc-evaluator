@@ -1,6 +1,9 @@
 package ClientSide;
 
+import java.util.HashMap;
+
 import Field.Point2D;
+import MP.MessageProcessor;
 
 public class ClientApp {
 
@@ -8,6 +11,7 @@ public class ClientApp {
     private int clientId; 
     private Point2D location = new Point2D(); 
     private int homeServerId;
+    private HashMap<Integer, MessageProcessor> MPmap = new HashMap<>();
     private static final ManagementServiceForClient service = new ManagementServiceForClient();
 
     public ClientApp(int applicationId, int clientId) {
@@ -24,7 +28,7 @@ public class ClientApp {
         service.getHomeServerId(this);
     }
 
-    public void assignHomeserver(int plus_connection, int plus_used){
+    public void assignHomeserver(int plus_connection, double plus_used){
         service.getHomeServerId(this, plus_connection, plus_used);
     }
     
@@ -69,6 +73,14 @@ public class ClientApp {
 
     public void setHomeServerId(int homeServerId) {
         this.homeServerId = homeServerId;
+    }
+
+    public HashMap<Integer, MessageProcessor> getMPmap() {
+        return MPmap;
+    }
+
+    public void setMPmap(HashMap<Integer, MessageProcessor> mPmap) {
+        MPmap = mPmap;
     }
 
 

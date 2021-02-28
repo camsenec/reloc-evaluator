@@ -63,9 +63,9 @@ public class ManagementServiceForClient {
 
         try {
             Response<ClientModel> response = call.execute();
-            System.out.println(response.body());
+            //System.out.println(response.body());
             client.setHomeServerId(response.body().getHome());
-            System.out.println("Client " + client.getClientId() + " registered");
+            //System.out.println("Client " + client.getClientId() + " registered");
         }catch(EOFException e){
             e.printStackTrace();
         }catch(IOException e){
@@ -135,7 +135,7 @@ public class ManagementServiceForClient {
 
     }
 
-    public void getHomeServerId(ClientApp client, int plus_connection, int plus_used){
+    public void getHomeServerId(ClientApp client, int plus_connection, double plus_used){
         RequestBody plus_connection_body = RequestBody.create(MediaType.parse("multipart/form-data"),
                 String.valueOf(plus_connection));
 
