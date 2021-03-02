@@ -1,4 +1,5 @@
 package FileIO;
+
 import ClientSide.ClientApp;
 import ClientSide.ManagementServiceForClient;
 import EdgeServer.ManagementServiceForServer;
@@ -6,6 +7,7 @@ import EdgeServer.MecHost;
 import Field.Point2D;
 import Logger.TxLog;
 import Result.Result;
+import Utility.Tuple;
 import Result.Metric;
 
 import java.io.*;
@@ -31,13 +33,28 @@ public class FileFactory {
                 line = line.replace("]\"", "");
                 line = line.replace(" ", "");
                 String[] data = line.split(",", -1);
-
-                ArrayList<Integer> sendTo = new ArrayList<>();
+                ArrayList<Integer> sendToSec = new ArrayList<>();
                 int client_id = Integer.parseInt(data[1]);
                 for (int i = 2; i < data.length; i++) {
-                    sendTo.add(Integer.parseInt(data[i]));
+                    sendToSec.add(Integer.parseInt(data[i]));
                 }
-                TxLog.txLog.put(client_id, sendTo);
+                TxLog.txLogSec.put(client_id, sendToSec);
+
+                ArrayList<Integer> groupMember = new ArrayList<>();
+                int rep_id = Integer.parseInt(data[1]);
+                for (int i = 1; i < data.length; i++) {
+                    groupMember.add(Integer.parseInt(data[i]));
+                }
+                for(int member_id : groupMember){
+                    int sender_id = member_id;
+                    ArrayList<Integer> sendTo = new ArrayList<>();
+                    for(int receiver_id: groupMember){
+                        if(receiver_id != sender_id){
+                            sendTo.add(receiver_id);
+                        }
+                    }
+                    TxLog.txLog.put(new Tuple<Integer, Integer>(rep_id, sender_id), sendTo);
+                }
                 count++;
             }
             System.out.println(count + " Transactions were loaded");
@@ -47,7 +64,7 @@ public class FileFactory {
         }
 
         if(DEBUG) {
-            for (Integer key : TxLog.txLog.keySet()) {
+            for (Tuple<Integer, Integer> key : TxLog.txLog.keySet()) {
                 ArrayList<Integer> tmp = TxLog.txLog.get(key);
                 System.out.print(key + ":");
                 for (int sendto : tmp) {
@@ -231,7 +248,7 @@ public class FileFactory {
                 p.print(",");
                 p.print(server.getConnection());
                 p.print(",");
-                p.print(server.getUsed());
+                p.printf("%.4f",server.getUsed());
                 p.print(",");
                 p.print(server.getMPmap().size());
                 p.print(",");
@@ -260,7 +277,7 @@ public class FileFactory {
             p.print(",");
             p.printf("%.4f",Metric.MET_3);
             p.print(",");
-            p.printf("%.4f",Metric.MET_4);
+            p.printf("%f",Metric.MET_4);
 
             p.println();
             p.close();

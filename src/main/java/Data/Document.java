@@ -5,7 +5,7 @@ public class Document {
     /** METADATA **/
     private int applicationId;
     private int documentId;
-    private int size;
+    private double size;
 
     /*
       private ArrayList<Integer> cachedServer = new ArrayList<>();
@@ -16,7 +16,7 @@ public class Document {
         this.documentId = documentId;
     }
 
-    public void initialize(int docSize){
+    public void initialize(double docSize){
         this.size = docSize;
     }
 
@@ -36,11 +36,11 @@ public class Document {
         this.documentId = documentId;
     }
 
-    public int getSize() {
+    public double getSize() {
         return size;
     }
 
-    public void setSize(int size) {
+    public void setSize(double size) {
         this.size = size;
     }
 }
