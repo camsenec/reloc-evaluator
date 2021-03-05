@@ -76,13 +76,17 @@ public class ManagementServiceForServer {
         
         RequestBody connection = RequestBody.create(MediaType.parse("multipart/form-data"),
                 String.valueOf(server.getConnection()));
+        
+        RequestBody cp = RequestBody.create(MediaType.parse("multipart/form-data"),
+                String.valueOf(server.getCp()));
 
 
         Call<EdgeServerModel> call = service.updateServerStatus(
                 server.getApplicationId(),
                 server.getServerId(),
                 used,
-                connection);
+                connection,
+                cp);
 
         try {
             Response<EdgeServerModel> response = call.execute();

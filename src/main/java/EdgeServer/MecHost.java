@@ -18,6 +18,7 @@ public class MecHost {
     private double used;
     private int capacity;
     private int connection;
+    private double cp;
     private HashMap<Integer, Document> collection = new HashMap<>();
     private HashMap<Integer, MessageProcessor> MPmap = new HashMap<>();
     private static final ManagementServiceForServer service = new ManagementServiceForServer();
@@ -75,6 +76,15 @@ public class MecHost {
 
     public void addConnection(int connection){
         this.connection+=connection;
+        service.updateState(this);
+    }
+
+    public void updateCP(){
+        double cp = 0;
+        for(MessageProcessor mp : this.MPmap.values()){
+            cp+=mp.getDocMap().size()*mp.getClientMap().size();
+        }
+        this.cp = cp;
         service.updateState(this);
     }
 
@@ -149,6 +159,16 @@ public class MecHost {
     public void setClusterId(int clusterId) {
         this.clusterId = clusterId;
     }
+
+     public double getCp() {
+        return cp;
+    }
+
+    public void setCp(double cp) {
+        this.cp = cp;
+    }
+
+    
 
     
 

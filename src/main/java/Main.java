@@ -190,17 +190,20 @@ public class Main {
                             mp.getClientMap().putIfAbsent(senderId, sender);
                             sender.getMPmap().putIfAbsent(repId, mp);
                         }
+                        senderHome.updateCP();
                         //add mp to client
                         if(senderHome.getUsed() >= Config.capacityOfServers
-                            || senderHome.getConnection() >= Config.connectionLimit){
+                            || senderHome.getCp() >= Config.cpLimit){
                             System.out.println("Home Updated");
                             MecHost preHome = senderHome;
                             HashMap<Integer, MessageProcessor> copiedMPMap = sender.getMPmap();
                             double copiedSize = 0;
+                            double copiedCP = 0;
                             for(MessageProcessor copiedMP: copiedMPMap.values()){
                                 copiedSize += copiedMP.getDocMap().size();
+                                copiedCP += copiedMP.getDocMap().size() * 1;
                             }
-                            sender.assignHomeserver(1, copiedSize * Config.sizeOfDocs);
+                            sender.assignHomeserver(copiedCP, copiedSize * Config.sizeOfDocs);
                             MecHost newHome = ManagementServiceForServer.serverMap.get(sender.getHomeServerId());
                             
                             //add movedMp and copiedMP (mp, docs, connection, used) to newHome
@@ -223,6 +226,7 @@ public class Main {
                                     mpcp.getClientMap().put(senderId, sender);
                                     newHome.getMPmap().put(copiedMPId,mpcp);
                                 }
+                                newHome.updateCP();
                             }
 
                             for(int copiedMPId: copiedMPMap.keySet()){
@@ -241,6 +245,7 @@ public class Main {
                                 }
                             }
                             preHome.addConnection(-1);
+                            preHome.updateCP();
                         }                        
 
                         
@@ -280,18 +285,21 @@ public class Main {
                                 mp.getClientMap().putIfAbsent(receiverId, receiver);
                                 receiver.getMPmap().putIfAbsent(repId, mp);
                             }
+                            receiverHome.updateCP();
                             
 
                             if(receiverHome.getUsed() >= Config.capacityOfServers
-                                || receiverHome.getConnection() >= Config.connectionLimit){
+                                || receiverHome.getCp() >= Config.cpLimit){
                                 System.out.println("Home Updated");
                                 MecHost preHome = receiverHome;
                                 HashMap<Integer, MessageProcessor> copiedMPMap = receiver.getMPmap();
                                 double copiedSize = 0;
+                                double copiedCP = 0;
                                 for(MessageProcessor copiedMP: copiedMPMap.values()){
                                     copiedSize += copiedMP.getDocMap().size();
+                                    copiedCP += copiedMP.getDocMap().size() * 1;
                                 }
-                                receiver.assignHomeserver(1, copiedSize * Config.sizeOfDocs);
+                                receiver.assignHomeserver(copiedCP, copiedSize * Config.sizeOfDocs);
                                 MecHost newHome = ManagementServiceForServer.serverMap.get(receiver.getHomeServerId());
                                 
                                 //add movedMp and copiedMP (mp, docs, connection, used) to newHome
@@ -314,6 +322,7 @@ public class Main {
                                         mpcp.getClientMap().put(receiverId, receiver);
                                         newHome.getMPmap().put(copiedMPId,mpcp);
                                     }
+                                    newHome.updateCP();
                                 }
 
                                 for(int copiedMPId: copiedMPMap.keySet()){
@@ -332,6 +341,7 @@ public class Main {
                                     }
                                 }
                                 preHome.addConnection(-1);
+                                preHome.updateCP();
                             }
                         }
                     }
@@ -342,12 +352,11 @@ public class Main {
         if (Constants.TEST) {
             //Constants
             int A = Config.capacityOfServers;
-            int B = Config.connectionLimit;
-            int alpha = 12800 / 750;
+            int B = Config.cpLimit;
+            int dc = 5;
             int L = Config.numberOfServers;
             int N = txLog.size();
             int M = ManagementServiceForClient.clientMap.size();
-            double beta = 5;
             double gamma = 0.1;
             double gamma_2 = 0.01;
 
@@ -375,34 +384,27 @@ public class Main {
             HashMap<Integer, Double> aMap = new HashMap<>();
             for (Integer serverId : homeClientsMap.keySet()) {
                 MecHost s_l = ManagementServiceForServer.serverMap.get(serverId);
-                if (A >= s_l.getUsed()) {
-                    aMap.put(serverId, 0.0);
-                } else {
-                    aMap.put(serverId, 1 - (A / (double) s_l.getUsed()));
-                }
+                aMap.put(serverId, Math.min(1, A / (double) s_l.getUsed()));
             }
 
             double sum = 0;
             for (double a : aMap.values()) {
                 sum += a;
             }
-            Metric.MET_1 = alpha * sum / L;
+            Metric.MET_1 =  sum / L;
 
             //2. Y_2
             HashMap<Integer, Double> bMap = new HashMap<>();
             for (Integer serverId : homeClientsMap.keySet()) {
                 MecHost s_l = ManagementServiceForServer.serverMap.get(serverId);
-                if (B >= s_l.getConnection()) {
-                    bMap.put(serverId, 0.0);
-                } else {
-                    bMap.put(serverId, 1 - (B / (double) s_l.getConnection()));
-                }
+                bMap.put(serverId, Math.min(1, B / (double) s_l.getCp()));
             }
+
             sum = 0;
             for (double b : bMap.values()){
                 sum += b;
             }
-            Metric.MET_2 = beta * sum / L;
+            Metric.MET_2 = sum / L;
             /*
             sum = 0;
             for (MecHost server : ManagementServiceForServer.serverMap.values()) {
@@ -417,6 +419,7 @@ public class Main {
             Metric.MET_2 = Math.sqrt((double) sum / (L - 1));
             */
             //3.Y_3
+            HashMap<Integer, Double> distanceSumMap = new HashMap<>();
             HashMap<Integer, Double> distanceMap = new HashMap<>();
             for (int serverId : homeClientsMap.keySet()) {
                 ArrayList<Integer> C_l = homeClientsMap.get(serverId);
@@ -429,14 +432,15 @@ public class Main {
                     double dist = Math.sqrt(x_dist * x_dist + y_dist * y_dist);
                     distSum += dist;
                 }
-                distanceMap.put(serverId, distSum);
+                distanceSumMap.put(serverId, distSum);
+                distanceMap.put(serverId, distSum / C_l.size());
             }
 
             sum = 0;
-            for (int serverId : distanceMap.keySet()) {
-                sum += distanceMap.get(serverId);
+            for (int serverId : distanceSumMap.keySet()) {
+                sum += distanceSumMap.get(serverId);
             }
-            Metric.MET_3 = gamma * sum / M;
+            Metric.MET_3 = sum / M;
 
 
             //4.Y
@@ -452,10 +456,13 @@ public class Main {
                 double x_dist = Math.abs(sender.getLocation().getX() - senderHome.getLocation().getX());
                 double y_dist = Math.abs(sender.getLocation().getY() - senderHome.getLocation().getY());
                 
-                double dl1 = alpha * aMap.get(senderHomeId);
-                double dl2 = beta * bMap.get(senderHomeId);
-                double dl3 = gamma * Math.sqrt(x_dist * x_dist + y_dist * y_dist);
-                double dmp = dl1 + dl2 + dl3;
+                double dml = gamma * Math.sqrt(x_dist * x_dist + y_dist * y_dist);
+
+                double al = aMap.get(senderHomeId);
+                double bl = bMap.get(senderHomeId);
+                double cd = 2 * dc * (1 - al * bl);
+
+                double first = dml + cd;
                 
                 ArrayList<Integer> receivers = txLog.get(key); 
                 double dms_sum = 0;
@@ -473,14 +480,12 @@ public class Main {
                     x_dist = Math.abs(receiver.getLocation().getX() - receiverHome.getLocation().getX());
                     y_dist = Math.abs(receiver.getLocation().getY() - receiverHome.getLocation().getY());
                 
-                    dl1 = alpha * aMap.get(receiverHomeId);
-                    dl2 = beta * bMap.get(receiverHomeId);
-                    dl3 = gamma * Math.sqrt(x_dist * x_dist + y_dist * y_dist);
-                    dms_sum += dl1 + dl2 + dl3;
+                    double dlm = gamma * Math.sqrt(x_dist * x_dist + y_dist * y_dist);
+                    dms_sum += dlm;
                 }
-                double dmmid = dmmid_sum / receivers.size();
-                double dms = dms_sum / receivers.size();
-                di += (dmp + dmmid + dms);
+                double second = dmmid_sum / receivers.size();
+                double third = dms_sum / receivers.size();
+                di += (first + second + third);
             }
             Metric.MET_4 = di / N;
         }
@@ -521,6 +526,7 @@ public class Main {
             Result.rateOfSaved = (double) Result.saved / (double) Result.numberOfCachedDocument;
             Result.meanOfCachedDocs = Result.meanOfUsed / Config.sizeOfDocs;
 
+            String filename = "";
             FileFactory.saveResult();
             FileFactory.saveMetric();
             FileFactory.saveServerResult();

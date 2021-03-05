@@ -20,7 +20,8 @@ public interface EdgeServerAPI {
     Call<EdgeServerModel> updateServerStatus(@Query("application_id") int application_id,
                                              @Query("server_id") int server_id,
                                              @Part("used") RequestBody used,
-                                             @Part("connection") RequestBody connection);
+                                             @Part("connection") RequestBody connection,
+                                             @Part("cp") RequestBody cp);
 
 
 
@@ -48,7 +49,7 @@ public interface EdgeServerAPI {
     @PUT("api/v1/manager/user/update_home/")
     Call<ClientModel> updateHomeOfClient(@Query("application_id") int application_id,
                                          @Query("client_id") int client_id,
-                                         @Part("plus_connection") RequestBody plus_connection,
+                                         @Part("plus_cp") RequestBody plus_cp,
                                          @Part("plus_used") RequestBody plus_used);
 
     @Multipart
