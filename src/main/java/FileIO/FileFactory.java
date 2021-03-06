@@ -14,6 +14,7 @@ import java.io.*;
 import java.util.ArrayList;
 
 import static Constants.Constants.DEBUG;
+import Config.Config;
 
 public class FileFactory {
 
@@ -199,17 +200,17 @@ public class FileFactory {
             FileWriter f = new FileWriter("./Result/result.csv", true);
             PrintWriter p = new PrintWriter(new BufferedWriter(f));
 
-            p.print(Result.numberOfSender);
+            p.print(Result.numberOfGroups);
+            p.print(",");
+            p.print(Result.numberOfSenders);
             p.print(",");
             p.print(Result.numberOfClient);
             p.print(",");
-            p.print(Result.kindOfDocument);
+            p.print(Result.publishedDocument);
             p.print(",");
             p.print(Result.numberOfCachedDocument);
             p.print(",");
             p.printf("%.2f",Result.meanOfUsed);
-            p.print(",");
-            p.printf("%.2f",Result.meanOfCachedDocs);
             p.print(",");
             p.print(Result.minOfUsed);
             p.print(",");
@@ -231,7 +232,10 @@ public class FileFactory {
 
     public static void saveServerResult(){
        try {
-            FileWriter f = new FileWriter("./Result/serverResult.csv", false);
+            String filename = String.format("server-group-%d-doc-%d-loc-%d-cluster-%d-method-%s.csv", 
+                Result.numberOfGroups, Config.numberOfDocsPerClients, Config.locality, 
+                Config.numOfServersInCluster, Config.method);
+            FileWriter f = new FileWriter("./Result/" + filename, false);
             PrintWriter p = new PrintWriter(new BufferedWriter(f));
 
             for(int serverId : ManagementServiceForServer.serverMap.keySet()){
@@ -246,23 +250,63 @@ public class FileFactory {
                 p.print(",");
                 p.print(server.getCapacity());
                 p.print(",");
+                p.printf("%.4f", server.getUsed());
+                p.print(",");
                 p.print(server.getConnection());
                 p.print(",");
-                p.printf("%.4f",server.getUsed());
+                p.printf("%.4f", server.getCp());
                 p.print(",");
                 p.print(server.getMPmap().size());
                 p.print(",");
                 p.print(server.getClusterId());
+                p.print(",");
+                p.print(Result.aMap.get(serverId));
+                p.print(",");
+                p.print(Result.bMap.get(serverId));
+                p.print(",");
+                p.print(Result.distanceMap.get(serverId));
+                p.print(",");
                 p.println();
             }
             p.close();
 
-            System.out.println("Server states are saved to file！");
+            System.out.println("Server results are saved to file！");
 
         } catch (IOException e) {
             e.printStackTrace();
         } 
     }
+
+    public static void saveClientResult(){
+        try {
+
+            String filename = String.format("client-group-%d-doc-%d-loc-%d-cluster-%d-method-%s.csv", 
+                Result.numberOfGroups, Config.numberOfDocsPerClients, Config.locality, 
+                Config.numOfServersInCluster, Config.method);
+            FileWriter f = new FileWriter("./Result/" + filename, false);
+            PrintWriter p = new PrintWriter(new BufferedWriter(f));
+            for(int clientId : ManagementServiceForClient.clientMap.keySet()){
+                ClientApp client = ManagementServiceForClient.clientMap.get(clientId);
+                p.print(client.getApplicationId());
+                p.print(",");
+                p.print(client.getClientId());
+                p.print(",");
+                p.print(client.getLocation().getX());
+                p.print(",");
+                p.print(client.getLocation().getY());
+                p.print(",");
+                p.print(client.getHomeServerId());
+                p.println();
+            }
+            p.close();
+
+            System.out.println("Client results are saved to file！");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public static void saveMetric(){
         try {

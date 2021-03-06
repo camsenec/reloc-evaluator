@@ -27,8 +27,15 @@ import static Logger.TxLog.txLogDocs;
 public class Main {
 
     public static void main(String args[]) throws InterruptedException {
-        boolean RLCCA = true;
-        boolean LCCA = false;
+        
+        boolean RLCCA = false;
+        boolean OTOS = false;
+        if(Config.method == "RLCCA"){
+            RLCCA = true;
+        }else if(Config.method == "RCA"){
+            Config.numOfServersInCluster = 1;
+            OTOS = true;
+        }
         boolean FIG = false;
 
         ManagementServiceForClient service = new ManagementServiceForClient();
@@ -55,7 +62,7 @@ public class Main {
 
             /* Step 2 : Register client to a management server*/
             Random random;
-            if(FIG) random = new Random(1);
+            if(FIG) random = new Random(3);
             else random = new Random();
 
             ArrayList<Integer> memoSenders = new ArrayList<>();
@@ -130,7 +137,7 @@ public class Main {
                 for (int documentId : publishedDocuments) {
                     Document document = DataBase.dataBase.get(documentId);
                     
-                    if(!RLCCA && !LCCA){
+                    if(!RLCCA && !OTOS){
                         int homeId = ManagementServiceForClient.clientMap.get(senderId).getHomeServerId();
                         MecHost server = ManagementServiceForServer.serverMap.get(homeId);
                         Document isExist = server.getCollection().putIfAbsent(document.getDocumentId(), document);
@@ -358,7 +365,7 @@ public class Main {
             int N = txLog.size();
             int M = ManagementServiceForClient.clientMap.size();
             double gamma = 0.1;
-            double gamma_2 = 0.01;
+            double gamma_2 = 0.1;
 
             HashMap<Integer, ArrayList<Integer>> homeClientsMap = new HashMap<>();
             for (Integer serverId : ManagementServiceForServer.serverMap.keySet()) {
@@ -381,27 +388,25 @@ public class Main {
             }
 
             //1. Y_1
-            HashMap<Integer, Double> aMap = new HashMap<>();
             for (Integer serverId : homeClientsMap.keySet()) {
                 MecHost s_l = ManagementServiceForServer.serverMap.get(serverId);
-                aMap.put(serverId, Math.min(1, A / (double) s_l.getUsed()));
+                Result.aMap.put(serverId, Math.min(1, A / (double) s_l.getUsed()));
             }
 
             double sum = 0;
-            for (double a : aMap.values()) {
+            for (double a : Result.aMap.values()) {
                 sum += a;
             }
             Metric.MET_1 =  sum / L;
 
             //2. Y_2
-            HashMap<Integer, Double> bMap = new HashMap<>();
             for (Integer serverId : homeClientsMap.keySet()) {
                 MecHost s_l = ManagementServiceForServer.serverMap.get(serverId);
-                bMap.put(serverId, Math.min(1, B / (double) s_l.getCp()));
+                Result.bMap.put(serverId, Math.min(1, B / (double) s_l.getCp()));
             }
 
             sum = 0;
-            for (double b : bMap.values()){
+            for (double b : Result.bMap.values()){
                 sum += b;
             }
             Metric.MET_2 = sum / L;
@@ -420,7 +425,6 @@ public class Main {
             */
             //3.Y_3
             HashMap<Integer, Double> distanceSumMap = new HashMap<>();
-            HashMap<Integer, Double> distanceMap = new HashMap<>();
             for (int serverId : homeClientsMap.keySet()) {
                 ArrayList<Integer> C_l = homeClientsMap.get(serverId);
                 MecHost s_l = ManagementServiceForServer.serverMap.get(serverId);
@@ -433,7 +437,7 @@ public class Main {
                     distSum += dist;
                 }
                 distanceSumMap.put(serverId, distSum);
-                distanceMap.put(serverId, distSum / C_l.size());
+                Result.distanceMap.put(serverId, distSum / C_l.size());
             }
 
             sum = 0;
@@ -458,22 +462,22 @@ public class Main {
                 
                 double dml = gamma * Math.sqrt(x_dist * x_dist + y_dist * y_dist);
 
-                double al = aMap.get(senderHomeId);
-                double bl = bMap.get(senderHomeId);
+                double al = Result.aMap.get(senderHomeId);
+                double bl = Result.bMap.get(senderHomeId);
                 double cd = 2 * dc * (1 - al * bl);
 
                 double first = dml + cd;
                 
                 ArrayList<Integer> receivers = txLog.get(key); 
-                double dms_sum = 0;
-                double dmmid_sum = 0;
+                double dlm_sum = 0;
+                double dll_sum = 0;
                 for(int receiverId: receivers){
                     ClientApp receiver = ManagementServiceForClient.clientMap.get(receiverId);
                     int receiverHomeId = receiver.getHomeServerId();
                     MecHost receiverHome = ManagementServiceForServer.serverMap.get(receiverHomeId);
                     x_dist = Math.abs(senderHome.getLocation().getX() - receiverHome.getLocation().getX());
                     y_dist = Math.abs(senderHome.getLocation().getY() - receiverHome.getLocation().getY());
-                    dmmid_sum += gamma_2 * Math.sqrt(x_dist * x_dist + y_dist * y_dist);
+                    dll_sum += gamma_2 * al * bl * Math.sqrt(x_dist * x_dist + y_dist * y_dist);
 
 
                     //subscriber side
@@ -481,10 +485,10 @@ public class Main {
                     y_dist = Math.abs(receiver.getLocation().getY() - receiverHome.getLocation().getY());
                 
                     double dlm = gamma * Math.sqrt(x_dist * x_dist + y_dist * y_dist);
-                    dms_sum += dlm;
+                    dlm_sum += dlm;
                 }
-                double second = dmmid_sum / receivers.size();
-                double third = dms_sum / receivers.size();
+                double second = dll_sum / receivers.size();
+                double third = dlm_sum / receivers.size();
                 di += (first + second + third);
             }
             Metric.MET_4 = di / N;
@@ -521,15 +525,19 @@ public class Main {
                 }
             }
             Result.meanOfUsed = (double) sumOfUsed / (double) ManagementServiceForServer.serverMap.size();
-            Result.numberOfSender = txLog.size();
-            Result.kindOfDocument = Result.numberOfSender * Config.numberOfDocsPerClients;
+            Result.numberOfGroups = TxLog.txLogSec.size();
+            Result.numberOfSenders = txLog.size();
+            Result.publishedDocument = Result.numberOfSenders * Config.numberOfDocsPerClients;
             Result.rateOfSaved = (double) Result.saved / (double) Result.numberOfCachedDocument;
             Result.meanOfCachedDocs = Result.meanOfUsed / Config.sizeOfDocs;
+            System.out.println(Result.aMap);
+            System.out.println(Result.bMap);
 
-            String filename = "";
+
             FileFactory.saveResult();
             FileFactory.saveMetric();
             FileFactory.saveServerResult();
+            FileFactory.saveClientResult();
         }
     }
 }

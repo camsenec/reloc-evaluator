@@ -135,9 +135,9 @@ public class ManagementServiceForClient {
 
     }
 
-    public void getHomeServerId(ClientApp client, int plus_connection, double plus_used){
-        RequestBody plus_connection_body = RequestBody.create(MediaType.parse("multipart/form-data"),
-                String.valueOf(plus_connection));
+    public void getHomeServerId(ClientApp client, double plus_cp, double plus_used){
+        RequestBody plus_cp_body = RequestBody.create(MediaType.parse("multipart/form-data"),
+                String.valueOf(plus_cp));
 
         RequestBody plus_used_body = RequestBody.create(MediaType.parse("multipart/form-data"),
                 String.valueOf(plus_used));
@@ -145,7 +145,7 @@ public class ManagementServiceForClient {
         Call<ClientModel> call = service.updateHomeOfClient(
                 client.getApplicationId(),
                 client.getClientId(),
-                plus_connection_body,
+                plus_cp_body,
                 plus_used_body);
 
         try {
