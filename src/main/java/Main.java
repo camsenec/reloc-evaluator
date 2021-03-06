@@ -28,15 +28,24 @@ public class Main {
 
     public static void main(String args[]) throws InterruptedException {
         
-        boolean RLCCA = false;
-        boolean OTOS = false;
-        if(Config.method == "RLCCA"){
-            RLCCA = true;
-        }else if(Config.method == "RCA"){
-            Config.numOfServersInCluster = 1;
-            OTOS = true;
+        //Config.method = "RA";
+        //Config.method = "NS";
+        //Config.method = "LCA";
+        //Config.method = "RCA";
+        //Config.method = "RLCA";
+        //Config.method = "LCCA";
+        //Config.method = "RCCA";
+        Config.method = "RLCCA";
+
+        if(Config.method == "RCA"){
+            Config.numOfServersInCluster = Config.numberOfServers;
+        }else if(Config.method == "RCCA"){
+            Config.numOfServersInCluster = Config.numberOfServers;
+            Config.method = "RLCCA";
+        }else{
+            Config.numOfServersInCluster = 4;
         }
-        boolean FIG = false;
+        boolean FIG = true;
 
         ManagementServiceForClient service = new ManagementServiceForClient();
 
@@ -50,6 +59,7 @@ public class Main {
         Constants.first();
         //Constants.notFirst();
         service.updateNumberOfCoopServer(Config.numOfServersInCluster);
+        service.updateStrategy(Config.method);
 
         if (Constants.UPLOAD) {
             /* Step 1 : Register server to a management server */
@@ -62,7 +72,7 @@ public class Main {
 
             /* Step 2 : Register client to a management server*/
             Random random;
-            if(FIG) random = new Random(3);
+            if(FIG) random = new Random(6); //6
             else random = new Random();
 
             ArrayList<Integer> memoSenders = new ArrayList<>();
@@ -137,7 +147,7 @@ public class Main {
                 for (int documentId : publishedDocuments) {
                     Document document = DataBase.dataBase.get(documentId);
                     
-                    if(!RLCCA && !OTOS){
+                    if(Config.method != "RLCCA" && Config.method != "OTOS"){
                         int homeId = ManagementServiceForClient.clientMap.get(senderId).getHomeServerId();
                         MecHost server = ManagementServiceForServer.serverMap.get(homeId);
                         Document isExist = server.getCollection().putIfAbsent(document.getDocumentId(), document);
@@ -199,8 +209,8 @@ public class Main {
                         }
                         senderHome.updateCP();
                         //add mp to client
-                        if(senderHome.getUsed() >= Config.capacityOfServers
-                            || senderHome.getCp() >= Config.cpLimit){
+                        if(senderHome.getUsed() > Config.capacityOfServers
+                            || senderHome.getCp() > Config.cpLimit){
                             System.out.println("Home Updated");
                             MecHost preHome = senderHome;
                             HashMap<Integer, MessageProcessor> copiedMPMap = sender.getMPmap();
@@ -295,8 +305,8 @@ public class Main {
                             receiverHome.updateCP();
                             
 
-                            if(receiverHome.getUsed() >= Config.capacityOfServers
-                                || receiverHome.getCp() >= Config.cpLimit){
+                            if(receiverHome.getUsed() > Config.capacityOfServers
+                                || receiverHome.getCp() > Config.cpLimit){
                                 System.out.println("Home Updated");
                                 MecHost preHome = receiverHome;
                                 HashMap<Integer, MessageProcessor> copiedMPMap = receiver.getMPmap();
@@ -314,6 +324,7 @@ public class Main {
                                 
                                 for(int copiedMPId: copiedMPMap.keySet()){
                                     MessageProcessor copiedMP = copiedMPMap.get(copiedMPId);
+                                    System.out.println(copiedMP.getDocMap());
                                     boolean isMPCP = newHome.getMPmap().containsKey(copiedMPId);
                                     if(!isMPCP){
                                         MessageProcessor mpcp = new MessageProcessor();
@@ -530,8 +541,6 @@ public class Main {
             Result.publishedDocument = Result.numberOfSenders * Config.numberOfDocsPerClients;
             Result.rateOfSaved = (double) Result.saved / (double) Result.numberOfCachedDocument;
             Result.meanOfCachedDocs = Result.meanOfUsed / Config.sizeOfDocs;
-            System.out.println(Result.aMap);
-            System.out.println(Result.bMap);
 
 
             FileFactory.saveResult();

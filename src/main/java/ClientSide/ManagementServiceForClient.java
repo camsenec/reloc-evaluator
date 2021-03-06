@@ -202,6 +202,25 @@ public class ManagementServiceForClient {
 
     }
 
+    public void updateStrategy(String strategy){
+
+        /*------create request body------*/
+        RequestBody strategyBody = RequestBody.create(MediaType.parse("multipart/form-data"),
+                strategy);
+
+
+        Call<ClientModel> call = service.updateStrategy(strategyBody);
+
+        try {
+            call.execute();
+        }catch(EOFException e){
+            e.printStackTrace();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+
+    }
+
 
 
 }

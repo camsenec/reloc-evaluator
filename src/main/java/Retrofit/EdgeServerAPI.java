@@ -63,6 +63,11 @@ public interface EdgeServerAPI {
     @PUT("api/v1/manager/area/update_number_of_coopserver/")
     Call<ClientModel> updateNumOfCoopServer(@Part("number_of_coopserver") RequestBody numOfCluster);
 
+    @Multipart
+    @PUT("api/v1/manager/area/update_strategy/")
+    Call<ClientModel> updateStrategy(@Part("strategy") RequestBody strategy);
+
+
 
 
 
