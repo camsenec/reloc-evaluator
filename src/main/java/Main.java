@@ -37,6 +37,7 @@ public class Main {
         //Config.method = "LCCA";
         //Config.method = "RCCA";
         //Config.method = "RLCCA";
+        boolean FIG = false;
 
         ArrayList<String> methods = new ArrayList<>(
             Arrays.asList("RA", "NS", "RLCA", "RLCCA") 
@@ -50,18 +51,23 @@ public class Main {
         ArrayList<Integer> numOfCoopServerList = new ArrayList<>(
             Arrays.asList(4, 8, 16, 2, 1) 
         );
-
-
+        
+        int epoch = 0;
+        for(int locality: localityList){
+            Config.numberOfDocsPerClients = pubNumList.get(0);
+            Config.locality = locality;
+            Config.numOfServersInCluster = numOfCoopServerList.get(0);
+        for(String method: methods){
+            Config.method = method;
 
         if(Config.method == "RCA"){
             Config.numOfServersInCluster = Config.numberOfServers;
         }else if(Config.method == "RCCA"){
             Config.numOfServersInCluster = Config.numberOfServers;
-            Config.method = "RLCCA";
+            Config.method = "OTOS";
         }else{
             Config.numOfServersInCluster = 4;
         }
-        boolean FIG = false;
 
         ManagementServiceForClient service = new ManagementServiceForClient();
 
@@ -70,10 +76,10 @@ public class Main {
 
 
         /* read command line argument */
-        
+        if(epoch == 0) Constants.first();
+        else Constants.notFirst();
+        epoch++;
         Result.reset();
-        Constants.first();
-        //Constants.notFirst();
         service.updateNumberOfCoopServer(Config.numOfServersInCluster);
         service.updateStrategy(Config.method);
 
@@ -476,7 +482,7 @@ public class Main {
             for (double a : Result.aMap.values()) {
                 sum += a;
             }
-            Metric.MET_1 =  sum / L;
+            //Metric.MET_1 =  sum / L;
 
             //2. Y_2
             for (Integer serverId : homeClientsMap.keySet()) {
@@ -488,7 +494,7 @@ public class Main {
             for (double b : Result.bMap.values()){
                 sum += b;
             }
-            Metric.MET_2 = sum / L;
+            //Metric.MET_2 = sum / L;
             /*
             sum = 0;
             for (MecHost server : ManagementServiceForServer.serverMap.values()) {
@@ -523,7 +529,7 @@ public class Main {
             for (int serverId : distanceSumMap.keySet()) {
                 sum += distanceSumMap.get(serverId);
             }
-            Metric.MET_3 = sum / M;
+            //Metric.MET_3 = sum / M;
 
 
             //4.Y
@@ -570,8 +576,14 @@ public class Main {
                 double third = dlm_sum / receivers.size();
                 di += (first + second + third);
             }
-            Metric.MET_4 = di / N;
+            Metric.MET_6 = di / N;
         }
+
+        Metric.MET_1 = Result.numberOfGroups;
+        Metric.MET_2 = Config.numberOfDocsPerClients;
+        Metric.MET_3 = Config.locality;
+        Metric.MET_4 = Config.numOfServersInCluster;
+        Metric.MET_5 = Config.method;
             
 
         if (Constants.SAVE) {
@@ -616,5 +628,7 @@ public class Main {
             FileFactory.saveServerResult();
             FileFactory.saveClientResult();
         }
+    }
+    }
     }
 }

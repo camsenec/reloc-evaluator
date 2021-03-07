@@ -199,8 +199,16 @@ public class FileFactory {
         try {
             FileWriter f = new FileWriter("./Result/result.csv", true);
             PrintWriter p = new PrintWriter(new BufferedWriter(f));
-
-            p.print(Result.numberOfGroups);
+            
+            p.printf("%d",Metric.MET_1);
+            p.print(",");
+            p.printf("%df",Metric.MET_2);
+            p.print(",");
+            p.printf("%df",Metric.MET_3);
+            p.print(",");
+            p.printf("%d",Metric.MET_4);
+            p.print(",");
+            p.printf("%s",Metric.MET_5);
             p.print(",");
             p.print(Result.numberOfSenders);
             p.print(",");
@@ -240,6 +248,16 @@ public class FileFactory {
 
             for(int serverId : ManagementServiceForServer.serverMap.keySet()){
                 MecHost server = ManagementServiceForServer.serverMap.get(serverId);
+                p.printf("%d",Metric.MET_1);
+                p.print(",");
+                p.printf("%df",Metric.MET_2);
+                p.print(",");
+                p.printf("%df",Metric.MET_3);
+                p.print(",");
+                p.printf("%d",Metric.MET_4);
+                p.print(",");
+                p.printf("%s",Metric.MET_5);
+                p.print(",");
                 p.print(server.getApplicationId());
                 p.print(",");
                 p.print(server.getServerId());
@@ -287,6 +305,16 @@ public class FileFactory {
             PrintWriter p = new PrintWriter(new BufferedWriter(f));
             for(int clientId : ManagementServiceForClient.clientMap.keySet()){
                 ClientApp client = ManagementServiceForClient.clientMap.get(clientId);
+                p.printf("%d",Metric.MET_1);
+                p.print(",");
+                p.printf("%df",Metric.MET_2);
+                p.print(",");
+                p.printf("%df",Metric.MET_3);
+                p.print(",");
+                p.printf("%d",Metric.MET_4);
+                p.print(",");
+                p.printf("%s",Metric.MET_5);
+                p.print(",");
                 p.print(client.getApplicationId());
                 p.print(",");
                 p.print(client.getClientId());
@@ -313,15 +341,17 @@ public class FileFactory {
             FileWriter f = new FileWriter("./Result/metrics.csv", true);
             PrintWriter p = new PrintWriter(new BufferedWriter(f));
 
-            p.printf("%.4f",Metric.MET_1);
+            p.printf("%d",Metric.MET_1);
             p.print(",");
-            p.printf("%.4f",Result.meanOfUsed);
+            p.printf("%df",Metric.MET_2);
             p.print(",");
-            p.printf("%.4f",Metric.MET_2);
+            p.printf("%df",Metric.MET_3);
             p.print(",");
-            p.printf("%.4f",Metric.MET_3);
+            p.printf("%d",Metric.MET_4);
             p.print(",");
-            p.printf("%f",Metric.MET_4);
+            p.printf("%s",Metric.MET_5);
+            p.print(",");
+            p.printf("%.6f",Metric.MET_6);
 
             p.println();
             p.close();
