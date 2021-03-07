@@ -40,7 +40,7 @@ public class Main {
         boolean FIG = false;
 
         ArrayList<String> methods = new ArrayList<>(
-            Arrays.asList("RA", "NS", "RLCA", "RLCCA") 
+            Arrays.asList("RA", "NS", "RCCA", "RLCCA") 
         );
         ArrayList<Integer> pubNumList = new ArrayList<>(
             Arrays.asList(3, 1, 5, 7, 9) 
@@ -57,6 +57,7 @@ public class Main {
             Config.numberOfDocsPerClients = pubNumList.get(0);
             Config.locality = locality;
             Config.numOfServersInCluster = numOfCoopServerList.get(0);
+        
         for(String method: methods){
             Config.method = method;
 
@@ -71,6 +72,8 @@ public class Main {
 
         ManagementServiceForClient service = new ManagementServiceForClient();
 
+        TxLog.txLog.clear();
+        TxLog.txLogSec.clear();
         FileDownloader.downlaodLogFile(Constants.BASE_URL + "simulation/out/tx_log.csv");
         FileFactory.loadLogFile("tx_log.csv");
 
@@ -398,7 +401,6 @@ public class Main {
                                 
                                 for(int copiedMPId: copiedMPMap.keySet()){
                                     MessageProcessor copiedMP = copiedMPMap.get(copiedMPId);
-                                    System.out.println(copiedMP.getDocMap());
                                     boolean isMPCP = newHome.getMPmap().containsKey(copiedMPId);
                                     if(!isMPCP){
                                         MessageProcessor mpcp = new MessageProcessor();
@@ -579,7 +581,7 @@ public class Main {
             Metric.MET_6 = di / N;
         }
 
-        Metric.MET_1 = Result.numberOfGroups;
+        Metric.MET_1 = TxLog.txLogSec.size();
         Metric.MET_2 = Config.numberOfDocsPerClients;
         Metric.MET_3 = Config.locality;
         Metric.MET_4 = Config.numOfServersInCluster;

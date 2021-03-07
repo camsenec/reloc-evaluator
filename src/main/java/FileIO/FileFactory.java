@@ -202,9 +202,9 @@ public class FileFactory {
             
             p.printf("%d",Metric.MET_1);
             p.print(",");
-            p.printf("%df",Metric.MET_2);
+            p.printf("%d",Metric.MET_2);
             p.print(",");
-            p.printf("%df",Metric.MET_3);
+            p.printf("%d",Metric.MET_3);
             p.print(",");
             p.printf("%d",Metric.MET_4);
             p.print(",");
@@ -250,9 +250,9 @@ public class FileFactory {
                 MecHost server = ManagementServiceForServer.serverMap.get(serverId);
                 p.printf("%d",Metric.MET_1);
                 p.print(",");
-                p.printf("%df",Metric.MET_2);
+                p.printf("%d",Metric.MET_2);
                 p.print(",");
-                p.printf("%df",Metric.MET_3);
+                p.printf("%d",Metric.MET_3);
                 p.print(",");
                 p.printf("%d",Metric.MET_4);
                 p.print(",");
@@ -307,9 +307,9 @@ public class FileFactory {
                 ClientApp client = ManagementServiceForClient.clientMap.get(clientId);
                 p.printf("%d",Metric.MET_1);
                 p.print(",");
-                p.printf("%df",Metric.MET_2);
+                p.printf("%d",Metric.MET_2);
                 p.print(",");
-                p.printf("%df",Metric.MET_3);
+                p.printf("%d",Metric.MET_3);
                 p.print(",");
                 p.printf("%d",Metric.MET_4);
                 p.print(",");
@@ -343,9 +343,9 @@ public class FileFactory {
 
             p.printf("%d",Metric.MET_1);
             p.print(",");
-            p.printf("%df",Metric.MET_2);
+            p.printf("%d",Metric.MET_2);
             p.print(",");
-            p.printf("%df",Metric.MET_3);
+            p.printf("%d",Metric.MET_3);
             p.print(",");
             p.printf("%d",Metric.MET_4);
             p.print(",");

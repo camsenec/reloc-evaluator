@@ -35,6 +35,7 @@ public class MecHost {
         this.capacity = capacity;
         this.used = 0;
         this.connection = 0;
+        this.cp = 0;
         initializeLocation();
         service.registerToServer(this);
     }
@@ -43,6 +44,7 @@ public class MecHost {
         this.capacity = capacity;
         this.used = 0;
         this.connection = 0;
+        this.cp = 0;
         initializeLocation(id);
         service.registerToServer(this);
     }
@@ -91,6 +93,7 @@ public class MecHost {
     public void resetState(){
         this.used = 0;
         this.connection = 0;
+        this.cp = 0;
         service.updateState(this);
     }
 
