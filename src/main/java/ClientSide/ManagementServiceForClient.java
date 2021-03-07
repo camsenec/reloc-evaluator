@@ -151,8 +151,8 @@ public class ManagementServiceForClient {
         try {
             Response<ClientModel> response = call.execute();
             client.setHomeServerId(response.body().getHome());
-            System.out.println("Response: " + response.body());
-            System.out.println("Client " + client.getClientId() + " 's Home was obtained");
+            //System.out.println("Response: " + response.body());
+            //System.out.println("Client " + client.getClientId() + " 's Home was obtained");
         }catch(EOFException e){
             e.printStackTrace();
         }catch(IOException e){
@@ -219,6 +219,33 @@ public class ManagementServiceForClient {
             e.printStackTrace();
         }
 
+    }
+
+    public void deleteAll() {
+        Call<ClientModel> call = service.deleteClient(1);
+        try {
+            call.execute();
+        }catch(EOFException e){
+            e.printStackTrace();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        call = service.deleteServer(1);
+         try {
+            call.execute();
+        }catch(EOFException e){
+            e.printStackTrace();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        call = service.deleteCluster(1);
+         try {
+            call.execute();
+        }catch(EOFException e){
+            e.printStackTrace();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
     }
 
 

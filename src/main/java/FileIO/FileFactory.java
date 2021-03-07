@@ -197,7 +197,7 @@ public class FileFactory {
 
     public static void saveResult(){
         try {
-            FileWriter f = new FileWriter("./Result/result.csv", true);
+            FileWriter f = new FileWriter("./Result/" + Config.distinct + "result.csv", true);
             PrintWriter p = new PrintWriter(new BufferedWriter(f));
             
             p.printf("%d",Metric.MET_1);
@@ -243,7 +243,7 @@ public class FileFactory {
             String filename = String.format("server-group-%d-doc-%d-loc-%d-cluster-%d-method-%s.csv", 
                 Result.numberOfGroups, Config.numberOfDocsPerClients, Config.locality, 
                 Config.numOfServersInCluster, Config.method);
-            FileWriter f = new FileWriter("./Result/" + filename, false);
+            FileWriter f = new FileWriter("./Result/" + Config.distinct + filename, false);
             PrintWriter p = new PrintWriter(new BufferedWriter(f));
 
             for(int serverId : ManagementServiceForServer.serverMap.keySet()){
@@ -301,7 +301,7 @@ public class FileFactory {
             String filename = String.format("client-group-%d-doc-%d-loc-%d-cluster-%d-method-%s.csv", 
                 Result.numberOfGroups, Config.numberOfDocsPerClients, Config.locality, 
                 Config.numOfServersInCluster, Config.method);
-            FileWriter f = new FileWriter("./Result/" + filename, false);
+            FileWriter f = new FileWriter("./Result/" + Config.distinct + filename, false);
             PrintWriter p = new PrintWriter(new BufferedWriter(f));
             for(int clientId : ManagementServiceForClient.clientMap.keySet()){
                 ClientApp client = ManagementServiceForClient.clientMap.get(clientId);
@@ -338,7 +338,7 @@ public class FileFactory {
 
     public static void saveMetric(){
         try {
-            FileWriter f = new FileWriter("./Result/metrics.csv", true);
+            FileWriter f = new FileWriter("./Result/" + Config.distinct + "metrics.csv", true);
             PrintWriter p = new PrintWriter(new BufferedWriter(f));
 
             p.printf("%d",Metric.MET_1);
@@ -352,6 +352,12 @@ public class FileFactory {
             p.printf("%s",Metric.MET_5);
             p.print(",");
             p.printf("%.6f",Metric.MET_6);
+            p.print(",");
+            p.printf("%.6f",Metric.MET_7);
+            p.print(",");
+            p.printf("%.6f",Metric.MET_8);
+            p.print(",");
+            p.printf("%.6f",Metric.MET_9);
 
             p.println();
             p.close();

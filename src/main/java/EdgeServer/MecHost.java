@@ -84,7 +84,11 @@ public class MecHost {
     public void updateCP(){
         double cp = 0;
         for(MessageProcessor mp : this.MPmap.values()){
-            cp+=mp.getDocMap().size()*mp.getClientMap().size();
+            double size = 0;
+            for(Document spooler: mp.getDocMap().values()){
+                size += spooler.getSize();
+            }
+            cp+=size*mp.getClientMap().size();
         }
         this.cp = cp;
         service.updateState(this);

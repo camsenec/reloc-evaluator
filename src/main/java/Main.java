@@ -38,12 +38,14 @@ public class Main {
         //Config.method = "RCCA";
         //Config.method = "RLCCA";
         boolean FIG = false;
+        //Config.distinct = "";
+        Config.distinct = "disjoint-";
 
         ArrayList<String> methods = new ArrayList<>(
-            Arrays.asList("RA", "NS", "RCCA", "RLCCA") 
+            Arrays.asList("RA", "NS", "RCCA","RLCCA") 
         );
         ArrayList<Integer> pubNumList = new ArrayList<>(
-            Arrays.asList(3, 1, 5, 7, 9) 
+            Arrays.asList(2, 4, 6, 8, 10) 
         );
         ArrayList<Integer> localityList = new ArrayList<>(
             Arrays.asList(1, 5, 10, 15, 20) 
@@ -79,14 +81,18 @@ public class Main {
 
 
         /* read command line argument */
-        if(epoch == 0) Constants.first();
-        else Constants.notFirst();
+        //if(epoch == 0) Constants.first();
+        //else Constants.notFirst();
+        Constants.first();
         epoch++;
         Result.reset();
         service.updateNumberOfCoopServer(Config.numOfServersInCluster);
         service.updateStrategy(Config.method);
 
         if (Constants.UPLOAD) {
+            ManagementServiceForClient.clientMap.clear();
+            ManagementServiceForServer.serverMap.clear();
+            service.deleteAll();
             /* Step 1 : Register server to a management server */
             for (int i = 0; i < Config.numberOfServers; i++) {
                 MecHost host = new MecHost(Config.application_id);
@@ -151,23 +157,22 @@ public class Main {
 
         /*Step 3 : Prepare Document */
         int id = 1;
-        for (Tuple<Integer, Integer> key : txLog.keySet()) {
+        for (int repId : TxLog.txLogSec.keySet()) {
             ArrayList<Integer> docList = new ArrayList<>();
-            for (int i = 0; i < Config.numberOfDocsPerClients; i++) {
+            for (int i = 0; i < 1; i++) {
                 Document document = new Document(Config.application_id, id);
-                document.initialize(Config.sizeOfDocs);
+                document.initialize(1 * TxLog.txLogSec.get(repId).size() * Config.numberOfDocsPerClients);
                 DataBase.dataBase.put(id, document);
                 docList.add(id++);
             }
-            txLogDocs.put(key, docList);
+            txLogDocs.put(repId, docList);
         }
-        System.out.println(--id + " Documents are registered");
+        System.out.println(--id + " Spoolers are registered");
 
         if (Constants.SIMULATION) {
-            for (Tuple<Integer, Integer> key : txLog.keySet()) {
-                int repId = key.first;
-                int senderId = key.second;
-                ArrayList<Integer> publishedDocuments = txLogDocs.get(key);
+            for (Integer repId : TxLog.txLogSec.keySet()) {
+                int senderId = repId;
+                ArrayList<Integer> publishedDocuments = txLogDocs.get(repId);
 
                 for (int documentId : publishedDocuments) {
                     Document document = DataBase.dataBase.get(documentId);
@@ -210,7 +215,7 @@ public class Main {
                         }
                         senderHome.updateCP();
 
-                        List<Integer> receivers = txLog.get(key);
+                        List<Integer> receivers = TxLog.txLogSec.get(repId);
                         for (int receiverId : receivers) {
                             /* get home server of a receiver*/
                             ClientApp receiver = ManagementServiceForClient.clientMap.get(receiverId);
@@ -293,10 +298,14 @@ public class Main {
                             double copiedSize = 0;
                             double copiedCP = 0;
                             for(MessageProcessor copiedMP: copiedMPMap.values()){
-                                copiedSize += copiedMP.getDocMap().size();
-                                copiedCP += copiedMP.getDocMap().size() * 1;
+                                double size = 0;
+                                for(Document spooler: copiedMP.getDocMap().values()){
+                                    size += spooler.getSize();
+                                }
+                                copiedSize += size;
+                                copiedCP += size * 1;
                             }
-                            sender.assignHomeserver(copiedCP, copiedSize * Config.sizeOfDocs);
+                            sender.assignHomeserver(copiedCP, copiedSize);
                             MecHost newHome = ManagementServiceForServer.serverMap.get(sender.getHomeServerId());
                             
                             //add movedMp and copiedMP (mp, docs, connection, used) to newHome
@@ -307,7 +316,11 @@ public class Main {
                                 boolean isMPCP = newHome.getMPmap().containsKey(copiedMPId);
                                 if(!isMPCP){
                                     MessageProcessor mpcp = new MessageProcessor();
-                                    newHome.addUsed(Config.sizeOfDocs * copiedMP.getDocMap().size());
+                                    double added = 0;
+                                    for(Document spooler: copiedMP.getDocMap().values()){
+                                        added += spooler.getSize();
+                                    }
+                                    newHome.addUsed(added);
                                     for(int i: copiedMP.getDocMap().keySet()){
                                         newHome.getCollection().putIfAbsent(i, copiedMP.getDocMap().get(i));
                                     }
@@ -330,7 +343,11 @@ public class Main {
                                 }
                                 mpcp.getClientMap().remove(senderId);
                                 if(mpcp.getClientMap().size()==0){
-                                    preHome.addUsed(-Config.sizeOfDocs * mpcp.getDocMap().size());
+                                    double added = 0;
+                                    for(Document spooler: mpcp.getDocMap().values()){
+                                        added += spooler.getSize();
+                                    }
+                                    preHome.addUsed(-added);
                                     preHome.getMPmap().remove(copiedMPId);
                                     for(int i: mpcp.getDocMap().keySet()){
                                         preHome.getCollection().remove(i);
@@ -343,7 +360,7 @@ public class Main {
 
                         
                     
-                        List<Integer> receivers = txLog.get(key);
+                        List<Integer> receivers = TxLog.txLogSec.get(repId);
                         for (int receiverId : receivers) {
                             /* get home server of a receiver*/
                             ClientApp receiver = ManagementServiceForClient.clientMap.get(receiverId);
@@ -383,16 +400,20 @@ public class Main {
 
                             if(receiverHome.getUsed() > Config.capacityOfServers
                                 || receiverHome.getCp() > Config.cpLimit){
-                                System.out.println("Home Updated");
                                 MecHost preHome = receiverHome;
                                 HashMap<Integer, MessageProcessor> copiedMPMap = receiver.getMPmap();
                                 double copiedSize = 0;
                                 double copiedCP = 0;
                                 for(MessageProcessor copiedMP: copiedMPMap.values()){
-                                    copiedSize += copiedMP.getDocMap().size();
-                                    copiedCP += copiedMP.getDocMap().size() * 1;
+                                    double size = 0;
+                                    for(Document spooler: copiedMP.getDocMap().values()){
+                                        size += spooler.getSize();
+                                    }
+                                    copiedSize += size;
+                                    copiedCP += size * 1;
                                 }
-                                receiver.assignHomeserver(copiedCP, copiedSize * Config.sizeOfDocs);
+                                receiver.assignHomeserver(copiedCP, copiedSize);
+                                System.out.printf("Home Updated to %d\n", receiver.getHomeServerId());
                                 MecHost newHome = ManagementServiceForServer.serverMap.get(receiver.getHomeServerId());
                                 
                                 //add movedMp and copiedMP (mp, docs, connection, used) to newHome
@@ -404,7 +425,12 @@ public class Main {
                                     boolean isMPCP = newHome.getMPmap().containsKey(copiedMPId);
                                     if(!isMPCP){
                                         MessageProcessor mpcp = new MessageProcessor();
-                                        newHome.addUsed(Config.sizeOfDocs * copiedMP.getDocMap().size());
+                                        double added = 0;
+                                        for(Document spooler: copiedMP.getDocMap().values()){
+                                            added += spooler.getSize();
+                                        }
+                                        newHome.addUsed(added);
+                                        System.out.printf("%f : Added\n", added);
                                         for(int i: copiedMP.getDocMap().keySet()){
                                             newHome.getCollection().putIfAbsent(i, copiedMP.getDocMap().get(i));
                                         }
@@ -427,7 +453,12 @@ public class Main {
                                     }
                                     mpcp.getClientMap().remove(receiverId);
                                     if(mpcp.getClientMap().size()==0){
-                                        preHome.addUsed(-Config.sizeOfDocs * mpcp.getDocMap().size());
+                                         double added = 0;
+                                        for(Document spooler: mpcp.getDocMap().values()){
+                                            added += spooler.getSize();
+                                        }
+                                        System.out.printf("%f : Removed\n", added);
+                                        preHome.addUsed(-added);
                                         preHome.getMPmap().remove(copiedMPId);
                                         for(int i: mpcp.getDocMap().keySet()){
                                            preHome.getCollection().remove(i);
@@ -536,6 +567,9 @@ public class Main {
 
             //4.Y
             //The same data flow with the data flow in txLog
+            double first_sum = 0;
+            double second_sum = 0;
+            double third_sum = 0;
             double di = 0;
             for(Tuple<Integer, Integer> key: txLog.keySet()){
                 int senderId = key.second;
@@ -551,21 +585,22 @@ public class Main {
 
                 double al = Result.aMap.get(senderHomeId);
                 double bl = Result.bMap.get(senderHomeId);
-                double cd = 2 * dc * (1 - al * bl);
-
-                double first = dml + cd;
+                double cd = 2 * dc * (1 - Math.min(al,bl));
                 
-                ArrayList<Integer> receivers = txLog.get(key); 
+                ArrayList<Integer> receivers = txLog.get(key);
+                double dml_sum = 0;
                 double dlm_sum = 0;
-                double dll_sum = 0;
+                double mid_sum = 0;
                 for(int receiverId: receivers){
+                    dml_sum += dml;
+
                     ClientApp receiver = ManagementServiceForClient.clientMap.get(receiverId);
                     int receiverHomeId = receiver.getHomeServerId();
                     MecHost receiverHome = ManagementServiceForServer.serverMap.get(receiverHomeId);
                     x_dist = Math.abs(senderHome.getLocation().getX() - receiverHome.getLocation().getX());
                     y_dist = Math.abs(senderHome.getLocation().getY() - receiverHome.getLocation().getY());
-                    dll_sum += gamma_2 * al * bl * Math.sqrt(x_dist * x_dist + y_dist * y_dist);
-
+                    double dll = gamma_2 * Math.min(al,bl) * Math.sqrt(x_dist * x_dist + y_dist * y_dist);
+                    mid_sum += (dll + cd);
 
                     //subscriber side
                     x_dist = Math.abs(receiver.getLocation().getX() - receiverHome.getLocation().getX());
@@ -574,11 +609,18 @@ public class Main {
                     double dlm = gamma * Math.sqrt(x_dist * x_dist + y_dist * y_dist);
                     dlm_sum += dlm;
                 }
-                double second = dll_sum / receivers.size();
+                double first = dml_sum / receivers.size();
+                double second = mid_sum / receivers.size();
                 double third = dlm_sum / receivers.size();
+                first_sum += first;
+                second_sum += second;
+                third_sum += third;
                 di += (first + second + third);
             }
-            Metric.MET_6 = di / N;
+            Metric.MET_6 = first_sum / N;
+            Metric.MET_7 = second_sum / N;
+            Metric.MET_8 = third_sum / N;
+            Metric.MET_9 = di / N;
         }
 
         Metric.MET_1 = TxLog.txLogSec.size();

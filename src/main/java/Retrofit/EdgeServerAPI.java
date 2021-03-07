@@ -67,6 +67,17 @@ public interface EdgeServerAPI {
     @PUT("api/v1/manager/area/update_strategy/")
     Call<ClientModel> updateStrategy(@Part("strategy") RequestBody strategy);
 
+    
+    @DELETE("api/v1/manager/user/delete_all/")
+    Call<ClientModel> deleteClient(@Query("application_id") int application_id);
+
+    @DELETE("api/v1/manager/server/delete_all/")
+    Call<ClientModel> deleteServer(@Query("application_id") int application_id);
+
+    @DELETE("api/v1/manager/cluster/delete_all/")
+    Call<ClientModel> deleteCluster(@Query("application_id") int application_id);
+    
+
 
 
 
