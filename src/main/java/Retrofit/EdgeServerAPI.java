@@ -20,7 +20,8 @@ public interface EdgeServerAPI {
     Call<EdgeServerModel> updateServerStatus(@Query("application_id") int application_id,
                                              @Query("server_id") int server_id,
                                              @Part("used") RequestBody used,
-                                             @Part("connection") RequestBody connection);
+                                             @Part("connection") RequestBody connection,
+                                             @Part("cp") RequestBody cp);
 
 
 
@@ -48,7 +49,7 @@ public interface EdgeServerAPI {
     @PUT("api/v1/manager/user/update_home/")
     Call<ClientModel> updateHomeOfClient(@Query("application_id") int application_id,
                                          @Query("client_id") int client_id,
-                                         @Part("plus_connection") RequestBody plus_connection,
+                                         @Part("plus_cp") RequestBody plus_cp,
                                          @Part("plus_used") RequestBody plus_used);
 
     @Multipart
@@ -61,6 +62,22 @@ public interface EdgeServerAPI {
     @Multipart
     @PUT("api/v1/manager/area/update_number_of_coopserver/")
     Call<ClientModel> updateNumOfCoopServer(@Part("number_of_coopserver") RequestBody numOfCluster);
+
+    @Multipart
+    @PUT("api/v1/manager/area/update_strategy/")
+    Call<ClientModel> updateStrategy(@Part("strategy") RequestBody strategy);
+
+    
+    @DELETE("api/v1/manager/user/delete_all/")
+    Call<ClientModel> deleteClient(@Query("application_id") int application_id);
+
+    @DELETE("api/v1/manager/server/delete_all/")
+    Call<ClientModel> deleteServer(@Query("application_id") int application_id);
+
+    @DELETE("api/v1/manager/cluster/delete_all/")
+    Call<ClientModel> deleteCluster(@Query("application_id") int application_id);
+    
+
 
 
 

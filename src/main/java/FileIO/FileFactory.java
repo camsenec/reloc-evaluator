@@ -14,6 +14,7 @@ import java.io.*;
 import java.util.ArrayList;
 
 import static Constants.Constants.DEBUG;
+import Config.Config;
 
 public class FileFactory {
 
@@ -196,20 +197,28 @@ public class FileFactory {
 
     public static void saveResult(){
         try {
-            FileWriter f = new FileWriter("./Result/result.csv", true);
+            FileWriter f = new FileWriter("./Result/" + Config.distinct + "result.csv", true);
             PrintWriter p = new PrintWriter(new BufferedWriter(f));
-
-            p.print(Result.numberOfSender);
+            
+            p.printf("%d",Metric.MET_1);
+            p.print(",");
+            p.printf("%d",Metric.MET_2);
+            p.print(",");
+            p.printf("%d",Metric.MET_3);
+            p.print(",");
+            p.printf("%d",Metric.MET_4);
+            p.print(",");
+            p.printf("%s",Metric.MET_5);
+            p.print(",");
+            p.print(Result.numberOfSenders);
             p.print(",");
             p.print(Result.numberOfClient);
             p.print(",");
-            p.print(Result.kindOfDocument);
+            p.print(Result.publishedDocument);
             p.print(",");
             p.print(Result.numberOfCachedDocument);
             p.print(",");
             p.printf("%.2f",Result.meanOfUsed);
-            p.print(",");
-            p.printf("%.2f",Result.meanOfCachedDocs);
             p.print(",");
             p.print(Result.minOfUsed);
             p.print(",");
@@ -231,11 +240,24 @@ public class FileFactory {
 
     public static void saveServerResult(){
        try {
-            FileWriter f = new FileWriter("./Result/serverResult.csv", false);
+            String filename = String.format("server-group-%d-doc-%d-loc-%d-cluster-%d-method-%s.csv", 
+                Result.numberOfGroups, Config.numberOfDocsPerClients, Config.locality, 
+                Config.numOfServersInCluster, Config.method);
+            FileWriter f = new FileWriter("./Result/" + Config.distinct + filename, false);
             PrintWriter p = new PrintWriter(new BufferedWriter(f));
 
             for(int serverId : ManagementServiceForServer.serverMap.keySet()){
                 MecHost server = ManagementServiceForServer.serverMap.get(serverId);
+                p.printf("%d",Metric.MET_1);
+                p.print(",");
+                p.printf("%d",Metric.MET_2);
+                p.print(",");
+                p.printf("%d",Metric.MET_3);
+                p.print(",");
+                p.printf("%d",Metric.MET_4);
+                p.print(",");
+                p.printf("%s",Metric.MET_5);
+                p.print(",");
                 p.print(server.getApplicationId());
                 p.print(",");
                 p.print(server.getServerId());
@@ -246,38 +268,96 @@ public class FileFactory {
                 p.print(",");
                 p.print(server.getCapacity());
                 p.print(",");
+                p.printf("%.4f", server.getUsed());
+                p.print(",");
                 p.print(server.getConnection());
                 p.print(",");
-                p.printf("%.4f",server.getUsed());
+                p.printf("%.4f", server.getCp());
                 p.print(",");
                 p.print(server.getMPmap().size());
                 p.print(",");
                 p.print(server.getClusterId());
+                p.print(",");
+                p.print(Result.aMap.get(serverId));
+                p.print(",");
+                p.print(Result.bMap.get(serverId));
+                p.print(",");
+                p.print(Result.distanceMap.get(serverId));
+                p.print(",");
                 p.println();
             }
             p.close();
 
-            System.out.println("Server states are saved to file！");
+            System.out.println("Server results are saved to file！");
 
         } catch (IOException e) {
             e.printStackTrace();
         } 
     }
 
+    public static void saveClientResult(){
+        try {
+
+            String filename = String.format("client-group-%d-doc-%d-loc-%d-cluster-%d-method-%s.csv", 
+                Result.numberOfGroups, Config.numberOfDocsPerClients, Config.locality, 
+                Config.numOfServersInCluster, Config.method);
+            FileWriter f = new FileWriter("./Result/" + Config.distinct + filename, false);
+            PrintWriter p = new PrintWriter(new BufferedWriter(f));
+            for(int clientId : ManagementServiceForClient.clientMap.keySet()){
+                ClientApp client = ManagementServiceForClient.clientMap.get(clientId);
+                p.printf("%d",Metric.MET_1);
+                p.print(",");
+                p.printf("%d",Metric.MET_2);
+                p.print(",");
+                p.printf("%d",Metric.MET_3);
+                p.print(",");
+                p.printf("%d",Metric.MET_4);
+                p.print(",");
+                p.printf("%s",Metric.MET_5);
+                p.print(",");
+                p.print(client.getApplicationId());
+                p.print(",");
+                p.print(client.getClientId());
+                p.print(",");
+                p.print(client.getLocation().getX());
+                p.print(",");
+                p.print(client.getLocation().getY());
+                p.print(",");
+                p.print(client.getHomeServerId());
+                p.println();
+            }
+            p.close();
+
+            System.out.println("Client results are saved to file！");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     public static void saveMetric(){
         try {
-            FileWriter f = new FileWriter("./Result/metrics.csv", true);
+            FileWriter f = new FileWriter("./Result/" + Config.distinct + "metrics.csv", true);
             PrintWriter p = new PrintWriter(new BufferedWriter(f));
 
-            p.printf("%.4f",Metric.MET_1);
+            p.printf("%d",Metric.MET_1);
             p.print(",");
-            p.printf("%.4f",Result.meanOfUsed);
+            p.printf("%d",Metric.MET_2);
             p.print(",");
-            p.printf("%.4f",Metric.MET_2);
+            p.printf("%d",Metric.MET_3);
             p.print(",");
-            p.printf("%.4f",Metric.MET_3);
+            p.printf("%d",Metric.MET_4);
             p.print(",");
-            p.printf("%f",Metric.MET_4);
+            p.printf("%s",Metric.MET_5);
+            p.print(",");
+            p.printf("%.6f",Metric.MET_6);
+            p.print(",");
+            p.printf("%.6f",Metric.MET_7);
+            p.print(",");
+            p.printf("%.6f",Metric.MET_8);
+            p.print(",");
+            p.printf("%.6f",Metric.MET_9);
 
             p.println();
             p.close();

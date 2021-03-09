@@ -135,9 +135,9 @@ public class ManagementServiceForClient {
 
     }
 
-    public void getHomeServerId(ClientApp client, int plus_connection, double plus_used){
-        RequestBody plus_connection_body = RequestBody.create(MediaType.parse("multipart/form-data"),
-                String.valueOf(plus_connection));
+    public void getHomeServerId(ClientApp client, double plus_cp, double plus_used){
+        RequestBody plus_cp_body = RequestBody.create(MediaType.parse("multipart/form-data"),
+                String.valueOf(plus_cp));
 
         RequestBody plus_used_body = RequestBody.create(MediaType.parse("multipart/form-data"),
                 String.valueOf(plus_used));
@@ -145,14 +145,14 @@ public class ManagementServiceForClient {
         Call<ClientModel> call = service.updateHomeOfClient(
                 client.getApplicationId(),
                 client.getClientId(),
-                plus_connection_body,
+                plus_cp_body,
                 plus_used_body);
 
         try {
             Response<ClientModel> response = call.execute();
             client.setHomeServerId(response.body().getHome());
-            System.out.println("Response: " + response.body());
-            System.out.println("Client " + client.getClientId() + " 's Home was obtained");
+            //System.out.println("Response: " + response.body());
+            //System.out.println("Client " + client.getClientId() + " 's Home was obtained");
         }catch(EOFException e){
             e.printStackTrace();
         }catch(IOException e){
@@ -200,6 +200,52 @@ public class ManagementServiceForClient {
             e.printStackTrace();
         }
 
+    }
+
+    public void updateStrategy(String strategy){
+
+        /*------create request body------*/
+        RequestBody strategyBody = RequestBody.create(MediaType.parse("multipart/form-data"),
+                strategy);
+
+
+        Call<ClientModel> call = service.updateStrategy(strategyBody);
+
+        try {
+            call.execute();
+        }catch(EOFException e){
+            e.printStackTrace();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+
+    }
+
+    public void deleteAll() {
+        Call<ClientModel> call = service.deleteClient(1);
+        try {
+            call.execute();
+        }catch(EOFException e){
+            e.printStackTrace();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        call = service.deleteServer(1);
+         try {
+            call.execute();
+        }catch(EOFException e){
+            e.printStackTrace();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        call = service.deleteCluster(1);
+         try {
+            call.execute();
+        }catch(EOFException e){
+            e.printStackTrace();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
     }
 
 

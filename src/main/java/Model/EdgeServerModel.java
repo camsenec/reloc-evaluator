@@ -8,9 +8,10 @@ public class EdgeServerModel {
     private float capacity;
     private float used;
     private int connection;
+    private float cp;
     private int cluster_id;
 
-    public EdgeServerModel(int application_id, int server_id, float x, float y, float capacity, float used, int connection, int cluster_id) {
+    public EdgeServerModel(int application_id, int server_id, float x, float y, float capacity, float used, int connection, float cp, int cluster_id) {
         this.application_id = application_id;
         this.server_id = server_id;
         this.x = x;
@@ -18,6 +19,7 @@ public class EdgeServerModel {
         this.capacity = capacity;
         this.used = used;
         this.connection = connection;
+        this.cp = cp;
         this.cluster_id = cluster_id;
     }
 
@@ -69,7 +71,21 @@ public class EdgeServerModel {
         this.used = used;
     }
 
-    
+    public int getConnection() {
+        return connection;
+    }
+
+    public void setConnection(int connection) {
+        this.connection = connection;
+    }
+
+    public float getCp() {
+        return cp;
+    }
+
+    public void setCp(float cp) {
+        this.cp = cp;
+    }
 
     public int getCluster_id() {
         return cluster_id;
@@ -92,13 +108,6 @@ public class EdgeServerModel {
                 ", cluster_id=" + cluster_id +
                 '}';
     }
-
-    public int getConnection() {
-        return connection;
-    }
-
-    public void setConnection(int connection) {
-        this.connection = connection;
-    }
+    
 
 }

@@ -28,8 +28,8 @@ public class ClientApp {
         service.getHomeServerId(this);
     }
 
-    public void assignHomeserver(int plus_connection, double plus_used){
-        service.getHomeServerId(this, plus_connection, plus_used);
+    public void assignHomeserver(double plus_cp, double plus_used){
+        service.getHomeServerId(this, plus_cp, plus_used);
     }
     
     public void updateState(int newHomeId){
