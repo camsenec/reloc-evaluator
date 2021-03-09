@@ -37,40 +37,41 @@ public class Main {
         //Config.method = "LCCA";
         //Config.method = "RCCA";
         //Config.method = "RLCCA";
-        boolean FIG = false;
+        boolean FIG = true;
         //Config.distinct = "";
         Config.distinct = "disjoint-";
 
+        //ArrayList<String> methods = new ArrayList<>(
+        //    Arrays.asList("RA", "NS", "RCCA","RLCCA") 
+        //);
         ArrayList<String> methods = new ArrayList<>(
-            Arrays.asList("RA", "NS", "RCCA","RLCCA") 
+            Arrays.asList("RLCCA") 
         );
         ArrayList<Integer> pubNumList = new ArrayList<>(
             Arrays.asList(2, 4, 6, 8, 10) 
         );
         ArrayList<Integer> localityList = new ArrayList<>(
-            Arrays.asList(1, 5, 10, 15, 20) 
+            Arrays.asList(5, 10, 15, 20) 
         );
         ArrayList<Integer> numOfCoopServerList = new ArrayList<>(
-            Arrays.asList(4, 8, 16, 2, 1) 
+            Arrays.asList(16, 8, 4, 2, 1) 
         );
         
         int epoch = 0;
         for(int locality: localityList){
-            Config.numberOfDocsPerClients = pubNumList.get(0);
+            Config.numberOfDocsPerClients = 4;
             Config.locality = locality;
-            Config.numOfServersInCluster = numOfCoopServerList.get(0);
         
-        for(String method: methods){
-            Config.method = method;
+        for(int coop: numOfCoopServerList){
+            Config.numOfServersInCluster = coop;
 
         if(Config.method == "RCA"){
             Config.numOfServersInCluster = Config.numberOfServers;
         }else if(Config.method == "RCCA"){
             Config.numOfServersInCluster = Config.numberOfServers;
             Config.method = "OTOS";
-        }else{
-            Config.numOfServersInCluster = 4;
         }
+        Config.method = "RLCCA";
 
         ManagementServiceForClient service = new ManagementServiceForClient();
 
@@ -79,20 +80,26 @@ public class Main {
         FileDownloader.downlaodLogFile(Constants.BASE_URL + "simulation/out/tx_log.csv");
         FileFactory.loadLogFile("tx_log.csv");
 
-
         /* read command line argument */
-        //if(epoch == 0) Constants.first();
-        //else Constants.notFirst();
+        if(epoch % 5 == 0){
+            Constants.first();
+            ManagementServiceForClient.clientMap.clear();
+            ManagementServiceForServer.serverMap.clear();
+            service.deleteAll();
+        }
+        else{
+            Constants.notFirst();
+        }
         Constants.first();
+        ManagementServiceForClient.clientMap.clear();
+        ManagementServiceForServer.serverMap.clear();
+        service.deleteAll();
         epoch++;
         Result.reset();
         service.updateNumberOfCoopServer(Config.numOfServersInCluster);
         service.updateStrategy(Config.method);
 
         if (Constants.UPLOAD) {
-            ManagementServiceForClient.clientMap.clear();
-            ManagementServiceForServer.serverMap.clear();
-            service.deleteAll();
             /* Step 1 : Register server to a management server */
             for (int i = 0; i < Config.numberOfServers; i++) {
                 MecHost host = new MecHost(Config.application_id);
