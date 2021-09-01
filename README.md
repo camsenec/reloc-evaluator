@@ -1,2 +1,86 @@
-# RELOC-simulator
-simulator for https://github.com/camsenec/RELOC
+# RELOC Evaluator
+
+Evaluator for [reloc](https://github.com/camsenec/reloc), which is an edge server assignment system for static sensors.
+
+
+
+## Overview
+
+1. Register edge servers
+2. Register sensors (clients)
+3. A "home server" is assigned to each sensors based on the pub/sub relation among the sensors
+4. Resource usage of edge servers are calculated by simulation.
+5. Home server is updated so that any edge server's resource is not consumed over limitation.
+
+
+
+### Sensor distribution
+
+<img src="https://reloc.s3.eu-north-1.amazonaws.com/client_distribution.png">
+
+
+
+### Home server assignment and resource usage
+
+<img src="https://reloc.s3.eu-north-1.amazonaws.com/used.png">
+
+
+
+<img src="https://reloc.s3.eu-north-1.amazonaws.com/cp.png">
+
+
+
+
+
+## Usage
+
+```
+git clone https://github.com/camsenec/reloc-evaluator && cd reloc-evaluator
+```
+
+### Using Docker
+
+In a console
+
+```
+docker-compose up reloc
+```
+
+In another console
+
+```
+docker-compose up reloc-evaluator
+```
+
+
+
+### From source
+
+In a console,
+
+```
+git clone https://github.com/camsenec/reloc && cd reloc
+pip install -r requirements.txt
+python manage.py runserver
+```
+
+
+
+In another console
+
+```
+git clone https://github.com/camsenec/reloc-evaluator && cd reloc-evaluator
+mkdir app/cache app/log app/result
+gradle clean run
+```
+
+
+
+## Visualize
+
+```
+cd grapher
+pip3 install -r requirements.txt
+python3 grapher.py
+```
+
