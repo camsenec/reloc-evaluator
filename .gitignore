@@ -13,8 +13,6 @@ build
 
 .vscode
 
-.classpath
-
-.settings
-
-.project
+app/.classpath
+app/.settings
+app/.project
