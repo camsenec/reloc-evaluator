@@ -1,0 +1,12 @@
+./app/result
+./app/cache
+./app/log
+
+.git
+.gitignore
+.github
+.gitattributes
+
+Dockerfile
+docker-compose.yml
+.dockerignore

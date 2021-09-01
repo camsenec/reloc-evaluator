@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  reloc:
+    image: camsenec/reloc:${TAG}
+    ports:
+      - "8080:8080"
+    command: ["python3", "manage.py", "runserver", "0.0.0.0:8080"]
+    environment:
+      - HOST_IP=172.17.0.1
+      - FIELD_X_LENGTH=25
+      - FIELD_Y_LENGTH=25
+      - EDGE_SERVER_CAPACITY=640
+      - EDGE_SERVER_COMPUTATION_CAPACITY=3200
+  reloc-evaluator:
+    image: camsenec/reloc-evaluator:${TAG_EVALUATOR}
+    working_dir: /home/reloc-evaluator
+    volumes:
+      - ./app/result:/home/reloc-evaluator/app/result
+      - ./app/log:/home/reloc-evaluator/app/log
+    command: ["gradle", "run"]
+    depends_on:
+      - reloc
+    environment:
+      - SERVER_IP=172.17.0.1
+      - SERVER_PORT=8080
+      - FIELD_X_LENGTH=25
+      - FIELD_Y_LENGTH=25
+      - EDGE_SERVER_CAPACITY=640
+      - EDGE_SERVER_COMPUTATION_CAPACITY=3200
+      - NUM_OF_EDGE_SEREVERS=16
+      - NUM_OF_DOCS_PER_CLIENT=4
+    
