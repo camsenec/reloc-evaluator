@@ -12,3 +12,9 @@ build
 *.class
 
 .vscode
+
+.classpath
+
+.settings
+
+.project
