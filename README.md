@@ -6,10 +6,10 @@ Evaluator for [reloc](https://github.com/camsenec/reloc), which is an edge serve
 
 ## Overview
 
-1. Register edge servers
-2. Register sensors (clients)
-3. A "home server" is assigned to each sensors based on the pub/sub relation among the sensors
-4. Resource usage of edge servers are calculated by simulation.
+1. Register edge servers.
+2. Register sensors (clients).
+3. A "home server" is assigned to each sensors based on the pub/sub relation among the sensors.
+4. Resource usage of edge servers are calculated.
 5. Home server is updated so that any edge server's resource is not consumed over limitation.
 
 
