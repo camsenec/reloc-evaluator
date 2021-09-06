@@ -6,7 +6,7 @@ public class Config {
     public static double MIN_Y = 0;
     public static double MAX_X = 25;
     public static double MAX_Y = 25;
-    public static String BASE_URL = "http://127.0.0.1:8000/";
+    public static String BASE_URL = "http://127.0.0.1:8080/";
 
     public static int application_id = 1;
     public static int numberOfServers = 16;
