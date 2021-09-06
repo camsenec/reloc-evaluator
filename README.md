@@ -16,17 +16,17 @@ Evaluator for [reloc](https://github.com/camsenec/reloc), which is an edge serve
 
 ### Sensor distribution
 
-<img src="https://reloc.s3.eu-north-1.amazonaws.com/client_distribution.png">
+<div align="center"><img width=700px src="https://reloc.s3.eu-north-1.amazonaws.com/client_distribution.png"></div>
 
 
 
 ### Home server assignment and resource usage
 
-<img src="https://reloc.s3.eu-north-1.amazonaws.com/used.png">
+<div align="center"><img width=700px src="https://reloc.s3.eu-north-1.amazonaws.com/used.png"></div>
 
 
 
-<img src="https://reloc.s3.eu-north-1.amazonaws.com/cp.png">
+<div align="center"><img width=700px src="https://reloc.s3.eu-north-1.amazonaws.com/cp.png"></div>
 
 
 
@@ -40,18 +40,9 @@ git clone https://github.com/camsenec/reloc-evaluator && cd reloc-evaluator
 
 ### Using Docker
 
-In a console
-
 ```
-docker-compose up reloc
+docker-compose up
 ```
-
-In another console
-
-```
-docker-compose up reloc-evaluator
-```
-
 
 
 ### From source
