@@ -2,6 +2,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import networkx as nx
 import itertools
+import os
 
 def generate_client_distribution_graph():
 
@@ -15,11 +16,9 @@ def generate_client_distribution_graph():
             data[i] = data[i].strip(" '[]\"")
             data[i] = int(data[i])
         groups.append(data)
-        print(data)
 
     for i in range(len(groups)):    
         groups[i] = list(itertools.combinations(groups[i] ,2))
-        print(groups[i])
 
 
     file.close()
@@ -229,7 +228,6 @@ def generate_resource_comsumption_graph(field, capacity):
     edge_x = []
     edge_y = []
     for edge in G.edges():
-        print(edge)
         x0, y0 = G.nodes[edge[0]]['pos']
         x1, y1 = G.nodes[edge[1]]['pos']
         edge_x.append(x0)
@@ -273,6 +271,8 @@ def generate_resource_comsumption_graph(field, capacity):
     fig.show()
 
 if __name__ == "__main__":
+    A = int(os.environ.get("EDGE_SERVER_CAPACITY", 640))
+    B = int(os.environ.get("EDGE_SERVER_COMPUTATION_CAPACITY", 3200))
     generate_client_distribution_graph()
-    generate_resource_comsumption_graph("used", 640)
-    generate_resource_comsumption_graph("cp", 3200)
+    generate_resource_comsumption_graph("used", A)
+    generate_resource_comsumption_graph("cp", B)

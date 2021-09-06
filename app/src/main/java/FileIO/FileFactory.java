@@ -5,8 +5,8 @@ import ClientSide.ManagementServiceForClient;
 import EdgeServer.ManagementServiceForServer;
 import EdgeServer.MecHost;
 import Field.Point2D;
-import Logger.TxLog;
 import Result.Result;
+import TxLog.TxLog;
 import Utility.Tuple;
 import Result.Metric;
 

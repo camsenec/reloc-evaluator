@@ -7,9 +7,9 @@ import ClientSide.ManagementServiceForClient;
 import Data.Document;
 import EdgeServer.ManagementServiceForServer;
 import EdgeServer.MecHost;
-import Logger.TxLog;
 import MP.MessageProcessor;
 import Result.Result;
+import TxLog.TxLog;
 import Plugin.Cooporation;
 
 public class Broker {

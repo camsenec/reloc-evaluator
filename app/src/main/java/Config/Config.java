@@ -13,7 +13,7 @@ public class Config {
     public static int capacityOfServers = 640;
     public static double sizeOfDocs = 1;
     public static int cpLimit = 3200;
-    public static int numberOfDocsPerClient = 4;
+    public static int numberOfDocsPerClient = 1;
     public static int locality = 2;
     public static int numOfServersInCluster = 4;
     public static String method = "RELOC";

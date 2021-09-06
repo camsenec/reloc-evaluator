@@ -8,20 +8,20 @@ import Constants.Constants;
 import Field.Point2D;
 import FileIO.FileDownloader;
 import FileIO.FileFactory;
-import Logger.TxLog;
 import PubSubBroker.Broker;
+
+import static TxLog.TxLog.txLog;
+import static TxLog.TxLog.txLogDocs;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
 import Result.Result;
+import TxLog.TxLog;
 import Utility.Tuple;
 import Config.Config;
 import Result.Metric;
-
-import static Logger.TxLog.txLog;
-import static Logger.TxLog.txLogDocs;
 
 public class Main {
 
