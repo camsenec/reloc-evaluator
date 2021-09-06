@@ -40,18 +40,9 @@ git clone https://github.com/camsenec/reloc-evaluator && cd reloc-evaluator
 
 ### Using Docker
 
-In a console
-
 ```
-docker-compose up reloc
+docker-compose up
 ```
-
-In another console
-
-```
-docker-compose up reloc-evaluator
-```
-
 
 
 ### From source
