@@ -52,7 +52,7 @@ In a console,
 ```
 git clone https://github.com/camsenec/reloc && cd reloc
 pip install -r requirements.txt
-python manage.py runserver
+python manage.py runserver 8080
 ```
 
 
